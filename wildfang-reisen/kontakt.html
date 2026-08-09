@@ -53,9 +53,14 @@
     <div class="container grid grid--2" style="align-items:start; gap: var(--space-7);">
 
       <div>
-        <div class="placeholder-note">Hinweis: Telefon, allgemeine E-Mail-Adresse und Anschrift stammen aus den hinterlegten Wix-Unternehmensdaten. Die persönliche E-Mail-Adresse von Sarah Walter ist noch eine Annahme (Namensschema) und sollte vor Veröffentlichung bestätigt werden.</div>
+        <div class="placeholder-note">Hinweis: Telefon, allgemeine E-Mail-Adresse und Anschrift stammen aus den hinterlegten Wix-Unternehmensdaten. Die persönliche E-Mail-Adresse von Sarah Walter ist noch eine Annahme (Namensschema) und sollte vor Veröffentlichung bestätigt werden. Das Formular versendet über den kostenlosen Dienst FormSubmit.co an info@wildfang-reisen.de (Kopie an sarah.walter@wildfang-reisen.de) — beide Adressen müssen die allererste eingehende Nachricht per Bestätigungslink in ihrem Postfach freischalten, danach kommen alle weiteren Anfragen ohne zusätzlichen Schritt an.</div>
 
-        <form class="card" action="#" method="post">
+        <form class="card" action="https://formsubmit.co/info@wildfang-reisen.de" method="POST">
+          <input type="hidden" name="_cc" value="sarah.walter@wildfang-reisen.de">
+          <input type="hidden" name="_subject" value="Neue Anfrage über wildfang-reisen.de">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" value="" data-formsubmit-next>
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
           <h2>Nachricht senden</h2>
           <div class="form-row">
             <div class="form-field">

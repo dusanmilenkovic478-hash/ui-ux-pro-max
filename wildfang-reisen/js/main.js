@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  var formSubmitNext = document.querySelector('[data-formsubmit-next]');
+  if (formSubmitNext) {
+    formSubmitNext.value = new URL('danke.html', location.href).href;
+  }
+
   document.querySelectorAll('[data-slider]').forEach(function (slider) {
     var track = slider.querySelector('.photo-slider__track');
     var slides = slider.querySelectorAll('.photo-slider__slide');
