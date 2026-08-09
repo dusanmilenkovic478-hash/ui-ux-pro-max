@@ -581,8 +581,29 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .finder__result.is-active { display: block; animation: finder-fade var(--duration-base) var(--ease-standard); }
 .finder__result-grid { display: grid; grid-template-columns: 200px 1fr; gap: var(--space-6); align-items: center; }
 .finder__result-image { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius-md); }
+.finder__result-icon {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-accent-soft);
+  color: var(--color-accent-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .finder__result-label { font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent-strong); margin-bottom: var(--space-2); }
 .finder__result-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+.finder__summary {
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.finder__summary-row { display: flex; justify-content: space-between; gap: var(--space-4); font-size: var(--fs-sm); }
+.finder__summary-label { color: var(--color-text-muted); }
+.finder__summary-value { font-weight: 600; color: var(--color-brand-strong); text-align: right; }
 .finder__restart { font-size: var(--fs-sm); font-weight: 600; color: var(--color-text-muted); margin-top: var(--space-6); display: inline-block; }
 .finder__restart:hover { color: var(--color-brand); }
 
