@@ -102,6 +102,54 @@
 
   <section class="section">
     <div class="container">
+      <p class="eyebrow">Interaktiv</p>
+      <h2 class="max-w-content">Welche Ressource passt zur Fallkonstellation?</h2>
+      <p class="lede max-w-content">Drei kurze Fragen geben eine erste, unverbindliche Einschätzung, welche unserer Ressourcen — Marinele, KIM-Mobil oder Potosi — zur Ausgangssituation passen könnte. Das ersetzt kein Clearing-Gespräch, gibt aber einen ersten Anhaltspunkt für das weitere Vorgehen.</p>
+
+      <div class="finder" data-finder>
+        <div class="finder__progress">
+          <span class="finder__progress-step" data-progress-step></span>
+          <span class="finder__progress-step" data-progress-step></span>
+          <span class="finder__progress-step" data-progress-step></span>
+        </div>
+
+        <div class="finder__question is-active" data-question>
+          <p class="finder__question-count">Frage 1 von 3</p>
+          <h3 class="finder__question-title">Wie akut ist die Situation?</h3>
+          <div class="finder__options">
+            <button type="button" class="finder__option" data-scores='{"kim":2,"marinele":0,"potosi":0}'>Akute Krise — kurzfristiger Rückzug und Ruhe werden sofort gebraucht</button>
+            <button type="button" class="finder__option" data-scores='{"kim":0,"marinele":1,"potosi":1}'>Geplante Maßnahme mit Vorlauf für Clearing und Vorbereitung</button>
+          </div>
+        </div>
+
+        <div class="finder__question" data-question>
+          <p class="finder__question-count">Frage 2 von 3</p>
+          <h3 class="finder__question-title">Was braucht der/die Jugendliche vor allem?</h3>
+          <div class="finder__options">
+            <button type="button" class="finder__option" data-scores='{"kim":1,"marinele":2,"potosi":0}'>Alltagsstruktur und feste Routinen — gemeinsam kochen, organisieren, Verantwortung übernehmen</button>
+            <button type="button" class="finder__option" data-scores='{"kim":0,"marinele":0,"potosi":2}'>Maximale Distanz zum bisherigen Umfeld und ein intensives Naturerlebnis auf See</button>
+            <button type="button" class="finder__option" data-scores='{"kim":2,"marinele":0,"potosi":0}'>In erster Linie Rückzug und Ruhe, ohne langen Vorlauf</button>
+          </div>
+          <a href="#" class="finder__back" data-back>← Zurück</a>
+        </div>
+
+        <div class="finder__question" data-question>
+          <p class="finder__question-count">Frage 3 von 3</p>
+          <h3 class="finder__question-title">Wie ist der zeitliche Rahmen?</h3>
+          <div class="finder__options">
+            <button type="button" class="finder__option" data-scores='{"kim":2,"marinele":1,"potosi":0}'>Flexibel, jederzeit startbar</button>
+            <button type="button" class="finder__option" data-scores='{"kim":0,"marinele":1,"potosi":2}'>Passt in eines der rund vier jährlichen Charter-Fenster der Potosi</button>
+          </div>
+          <a href="#" class="finder__back" data-back>← Zurück</a>
+        </div>
+
+        <div class="finder__result" data-result></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--subtle">
+    <div class="container">
       <div class="grid grid--2" style="align-items:center;">
         <div>
           <p class="eyebrow">Ihre Ansprechperson</p>
