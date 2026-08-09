@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var stepIndex = historyStack.length;
       renderProgress(stepIndex);
 
-      var html = '<p class="finder__question-count">Frage ' + (stepIndex + 1) + ' von ' + TOTAL_STEPS + '</p>';
+      var html = '<p class="finder__question-count">Schritt ' + (stepIndex + 1) + ' von ' + TOTAL_STEPS + '</p>';
       html += '<h3 class="finder__question-title">' + q.title + '</h3>';
       html += '<div class="finder__options">';
       q.options.forEach(function (opt, i) {
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function () {
         '<div class="finder__result-grid">' +
           mediaHtml +
           '<div>' +
-            '<p class="finder__result-label">Empfehlung</p>' +
+            '<p class="finder__result-label">Beispielhafte Einordnung</p>' +
             '<h3 class="mt-0">' + main.title + '</h3>' +
             '<p>' + main.info.text + '</p>' +
           '</div>' +
@@ -226,9 +226,9 @@ document.addEventListener('DOMContentLoaded', function () {
         summaryHtml +
         '<div class="finder__result-actions">' +
           (usesResource ? '<a class="btn btn--primary" href="' + main.info.anchor + '">Mehr zu ' + main.title + '</a>' : '') +
-          '<a class="btn ' + (usesResource ? 'btn--outline-dark' : 'btn--primary') + '" href="kontakt.html">Fall besprechen</a>' +
+          '<a class="btn ' + (usesResource ? 'btn--outline-dark' : 'btn--primary') + '" href="kontakt.html">Konkreten Fall besprechen</a>' +
         '</div>' +
-        '<a href="#" class="finder__restart" data-restart>↺ Noch einmal von vorn</a>';
+        '<a href="#" class="finder__restart" data-restart>↺ Anderes Beispiel durchspielen</a>';
 
       resultEl.classList.add('is-active');
 
