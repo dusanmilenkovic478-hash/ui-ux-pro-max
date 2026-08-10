@@ -314,22 +314,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   position: relative;
   overflow: hidden;
 }
-.hero::after {
-  content: "";
-  position: absolute;
-  right: -10%;
-  top: -20%;
-  width: 620px;
-  height: 620px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(245, 179, 1, 0.18);
-  pointer-events: none;
-}
 .hero::before {
   content: "";
   position: absolute;
-  right: 2%;
-  top: 12%;
+  right: calc(2% + 38px);
+  top: calc(12% + 19px);
   width: 480px;
   height: 320px;
   background-image: url('../assets/illustration-begleitung-hero.png');
