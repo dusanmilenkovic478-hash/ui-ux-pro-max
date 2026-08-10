@@ -446,6 +446,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   position: relative;
   overflow: hidden;
 }
+.audience-card h3 { color: var(--white); }
 .audience-card--alt { background: var(--grey-100); color: var(--color-text); }
 .audience-card--alt h3 { color: var(--color-brand-strong); }
 .audience-card--accent { background: var(--color-accent); color: var(--navy-900); }
