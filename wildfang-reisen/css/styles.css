@@ -328,13 +328,18 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .hero::before {
   content: "";
   position: absolute;
-  right: 6%;
-  top: 8%;
-  width: 420px;
-  height: 420px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.08);
+  right: 2%;
+  top: 12%;
+  width: 480px;
+  height: 320px;
+  background-image: url('../assets/illustration-begleitung-hero.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
   pointer-events: none;
+}
+@media (max-width: 900px) {
+  .hero::before { display: none; }
 }
 .hero__inner { padding: var(--space-9) 0 var(--space-8); position: relative; }
 .hero--page { padding: var(--space-8) 0 var(--space-7); }
