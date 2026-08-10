@@ -247,15 +247,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   padding: var(--space-4) 0;
 }
 .brand { display: flex; align-items: center; gap: var(--space-3); }
-.brand img { width: 44px; height: auto; }
-.brand__name {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 1.15rem;
-  color: var(--color-brand-strong);
-  line-height: 1.1;
-}
-.brand__sub { display: block; font-family: var(--font-body); font-weight: 500; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-muted); }
+.brand img { height: 42px; width: auto; }
 
 .nav { display: flex; align-items: center; gap: var(--space-6); }
 .nav__list { display: flex; gap: var(--space-5); }
