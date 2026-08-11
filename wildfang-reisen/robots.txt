@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /danke.html
 
-Sitemap: https://www.wildfang-reisen.de/sitemap.xml
+Sitemap: https://wildfangreisen-jugendhilfe.de/sitemap.xml
