@@ -659,16 +659,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .contact-panel__block:first-child { padding-top: 0; }
 .contact-panel__role { color: var(--yellow-300); font-size: var(--fs-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
 
-.placeholder-note {
-  font-size: var(--fs-xs);
-  color: var(--color-text-muted);
-  background: var(--grey-100);
-  border: 1px dashed var(--grey-300);
-  border-radius: var(--radius-sm);
-  padding: var(--space-3) var(--space-4);
-  margin-bottom: var(--space-6);
-}
-
 /* --- Legal text ---------------------------------------------------------------- */
 .legal h2 { font-size: var(--fs-lg); margin-top: var(--space-8); }
 .legal h2:first-of-type { margin-top: 0; }
