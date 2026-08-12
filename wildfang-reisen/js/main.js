@@ -251,3 +251,47 @@ document.addEventListener('DOMContentLoaded', function () {
     renderQuestion('standort');
   }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (!('IntersectionObserver' in window)) return;
+
+  var targets = document.querySelectorAll(
+    '.section > .container > h2, .card, .audience-card, .stat-frame, .contact-panel, .quote, .trust-strip__item'
+  );
+  if (!targets.length) return;
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  // Group by parent so items that share a row (cards in a grid, trust-strip
+  // items) cascade in with a short stagger instead of popping in as one block.
+  var groups = new Map();
+  targets.forEach(function (el) {
+    var siblings = groups.get(el.parentElement) || [];
+    siblings.push(el);
+    groups.set(el.parentElement, siblings);
+  });
+  groups.forEach(function (siblings) {
+    siblings.forEach(function (el, i) {
+      el.style.setProperty('--reveal-i', Math.min(i, 5));
+      el.classList.add('js-reveal');
+      observer.observe(el);
+    });
+  });
+
+  // Safety net: a large scroll jump (End key, footer/anchor link, scroll-to-top)
+  // can skip an element's viewport pass entirely, leaving it permanently hidden.
+  // Force-reveal anything still unrevealed a few seconds after load.
+  setTimeout(function () {
+    document.querySelectorAll('.js-reveal:not(.is-visible)').forEach(function (el) {
+      el.classList.add('is-visible');
+      observer.unobserve(el);
+    });
+  }, 3000);
+});
