@@ -1,6 +1,13 @@
 {
   "version": 1,
   "skills": {
+    "apple-design-skill": {
+      "source": "naplesblue/apple-design-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "a5370aa9c0f4ac69fec5c6072ed19639339da073bb689cc6b6e165d434bbdf56",
+      "note": "Manually installed — upstream SKILL.md frontmatter has a YAML syntax bug (unquoted colon in description) that the skills CLI rejects; fixed locally by wrapping description in a block scalar."
+    },
     "brainstorming": {
       "source": "obra/superpowers",
       "sourceType": "github",
