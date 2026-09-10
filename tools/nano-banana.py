@@ -17,7 +17,7 @@ import urllib.error
 import urllib.request
 
 API_ROOT = "https://generativelanguage.googleapis.com/v1beta"
-DEFAULT_MODEL = "gemini-2.5-flash-image"
+DEFAULT_MODEL = "gemini-3.1-flash-image"  # höchste Qualität: gemini-3-pro-image
 
 
 def request(url: str, payload: dict | None = None) -> dict:
