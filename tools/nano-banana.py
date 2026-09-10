@@ -20,24 +20,16 @@ API_ROOT = "https://generativelanguage.googleapis.com/v1beta"
 DEFAULT_MODEL = "gemini-2.5-flash-image"
 
 
-def api_key() -> str:
-    key = os.environ.get("GEMINI_API_KEY")
-    if not key:
-        sys.exit(
-            "GEMINI_API_KEY ist nicht gesetzt.\n"
-            "Key auf https://aistudio.google.com/apikey erzeugen und als "
-            "Umgebungsvariable hinterlegen (nicht im Code speichern)."
-        )
-    return key
-
-
 def request(url: str, payload: dict | None = None) -> dict:
+    # Ohne GEMINI_API_KEY läuft der Aufruf über die API-Anmeldedaten der
+    # Cloud-Umgebung: der Agent-Proxy hängt den Schlüssel außerhalb der
+    # Session an, die Anfrage geht hier bewusst ohne Auth-Header raus.
+    headers = {"Content-Type": "application/json"}
+    if key := os.environ.get("GEMINI_API_KEY"):
+        headers["x-goog-api-key"] = key
+
     data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={"x-goog-api-key": api_key(), "Content-Type": "application/json"},
-    )
+    req = urllib.request.Request(url, data=data, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=180) as resp:
             return json.load(resp)
