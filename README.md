@@ -1,8 +1,12 @@
 # Malte's Life
 
 Ein Mathe-Lernspiel, das offline auf dem eigenen Laptop läuft.
-Gebaut für eine 15-jährige Lernende mit Balkenagenesie, deren Mathe-Stand
-etwa bei Klasse 4/5 liegt und die bis zum Schulabschluss aufholen soll.
+Gebaut für eine 15-jährige Lernende mit Balkenagenesie, LRS und Dyskalkulie,
+deren Mathe-Stand etwa bei Klasse 4/5 liegt und die bis zum Schulabschluss
+aufholen soll.
+
+Die App ergänzt eine Förderung, sie ersetzt sie nicht. Bei diagnostizierter
+Dyskalkulie bleibt eine Lerntherapie der eigentliche Hebel.
 
 ## Was die App macht
 
@@ -20,6 +24,8 @@ etwa bei Klasse 4/5 liegt und die bis zum Schulabschluss aufholen soll.
   Aufgabe, teils erst als Hilfe nach einem Fehler.
 - **Eltern-Bereich hinter der PIN** mit Trefferquote je Kapitel und einem
   Hinweis, wo Nachhilfe ansetzen sollte.
+- **Wochentest.** Sonntags ein Test über das, was in der Woche geübt wurde.
+  Bestanden gibt es immer dieselbe Belohnung; zwei Versuche pro Woche.
 - **Gutschein-System.** Jedes bestandene Level gibt einen Gutschein mit Code.
   Mama tippt die PIN ein, der Gutschein wird als eingelöst gestempelt.
 - **Tagesziel 2 %.** 20 richtige Antworten am Tag = 2 %. 1000 richtige = 100 %.
@@ -37,6 +43,21 @@ Deshalb:
   Geknallt wird erst beim Levelabschluss.
 - **Kein Zeitdruck an keiner Stelle.**
 - **Konkret vor abstrakt.** Pizzastücke, Busfahrten, Rückgeld statt nackter Zahlen.
+
+Dazu kommen LRS und Dyskalkulie:
+
+- **Vorlesen.** Jede Aufgabe hat einen Lautsprecher-Knopf. Die Sprachausgabe
+  des Betriebssystems liest vor, kein Internet nötig. Mathe-Schreibweise wird
+  vorher übersetzt: "3/4" wird zu "drei Viertel", "14:30 Uhr" zu "14 Uhr 30",
+  "2,50 €" zu "2 Euro 50".
+- **Lesehilfe.** Umschaltbar: größere Schrift, mehr Zeichen- und Wortabstand,
+  mehr Zeilenhöhe. Bewusst keine Spezialschrift für Legasthenie — deren
+  Wirksamkeit ist in Studien nicht belegt, gut gesetzte Schrift schlägt sie.
+- **Kurze Sätze.** Textaufgaben stehen in Einzelsätzen, eine Information pro
+  Zeile, längste Zeile rund 40 Zeichen.
+- **Zwanzigerfeld und Zahlenstrahl.** Die Standard-Anschauungsmittel gegen
+  zählendes Rechnen. Rund 38 % der Aufgaben haben ein Mengenbild — bei den
+  ersten Stufen direkt sichtbar, sonst als Hilfe nach einem Fehler.
 
 ## Dateien
 

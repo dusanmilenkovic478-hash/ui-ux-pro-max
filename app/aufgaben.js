@@ -75,6 +75,56 @@ function zweiKreise(a, b) {
     <div><div>${teil(b)}</div><b style="display:block;margin-top:4px">${b}</b></div></div>`;
 }
 
+
+/* Zwanzigerfeld: der Klassiker gegen zählendes Rechnen.
+   Zwei Reihen à 10, nach 5 abgesetzt — Mengen werden auf einen Blick erfassbar. */
+function zwanzigerFeld(anzahl, zweiteMenge = 0) {
+  const d = 19, pad = 8, luecke = 9;
+  const bw = pad * 2 + 10 * d + luecke, bh = pad * 2 + 2 * d;
+  let p = "";
+  for (let i = 0; i < 20; i++) {
+    const reihe = Math.floor(i / 10), spalte = i % 10;
+    const x = pad + spalte * d + (spalte >= 5 ? luecke : 0) + d / 2;
+    const y = pad + reihe * d + d / 2;
+    let farbe = "rgba(255,255,255,.05)", rand = "rgba(255,255,255,.16)";
+    if (i < anzahl) { farbe = "var(--akzent)"; rand = "#0A0714"; }
+    else if (i < anzahl + zweiteMenge) { farbe = "#FFD84D"; rand = "#0A0714"; }
+    p += `<circle cx="${x}" cy="${y}" r="7" fill="${farbe}" stroke="${rand}" stroke-width="1.8"/>`;
+  }
+  return `<svg viewBox="0 0 ${bw} ${bh}" width="${Math.min(268, bw)}" aria-hidden="true">${p}</svg>`;
+}
+
+/* Zahlenstrahl mit optionalem Sprung — macht Plus und Minus als Bewegung sichtbar */
+function zahlenstrahl(von, bis, start, ziel) {
+  const bw = 280, bh = 74, lx = 22, rx = bw - 22;
+  const pos = (n) => lx + ((n - von) / (bis - von)) * (rx - lx);
+  const y = 50;
+  let p = `<line x1="${lx}" y1="${y}" x2="${rx}" y2="${y}" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/>`;
+  const schritt = Math.max(1, Math.round((bis - von) / 10));
+  for (let n = von; n <= bis; n += schritt) {
+    const x = pos(n);
+    p += `<line x1="${x}" y1="${y - 6}" x2="${x}" y2="${y + 6}" stroke="rgba(255,255,255,.3)" stroke-width="2"/>`;
+    p += `<text x="${x}" y="${y + 22}" fill="rgba(255,255,255,.55)" font-size="11" text-anchor="middle" font-family="sans-serif">${n}</text>`;
+  }
+  if (start !== undefined && ziel !== undefined) {
+    const x1 = pos(start), x2 = pos(ziel), hoch = y - 26;
+    p += `<path d="M${x1} ${y - 8} Q${(x1 + x2) / 2} ${hoch - 12} ${x2} ${y - 8}" fill="none" stroke="var(--akzent)" stroke-width="3" stroke-linecap="round"/>`;
+    p += `<circle cx="${x1}" cy="${y}" r="5.5" fill="#FFD84D" stroke="#0A0714" stroke-width="2"/>`;
+    p += `<circle cx="${x2}" cy="${y}" r="5.5" fill="var(--akzent)" stroke="#0A0714" stroke-width="2"/>`;
+  }
+  return `<svg viewBox="0 0 ${bw} ${bh}" width="${bw}" aria-hidden="true">${p}</svg>`;
+}
+
+/* Geldstücke statt nackter Cent-Zahlen */
+function muenzen(euro, cent) {
+  const teile = [];
+  for (let i = 0; i < Math.min(euro, 8); i++) teile.push(`<span style="font-size:1.5rem">🪙</span>`);
+  let t = `<div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:center;align-items:center">${teile.join("")}`;
+  if (euro > 8) t += `<b style="font-size:.9rem;margin-left:4px">…${euro} €</b>`;
+  if (cent) t += `<b style="font-size:.95rem;margin-left:8px">+ ${cent} ct</b>`;
+  return t + `</div>`;
+}
+
 /* ============================================================
    KAPITEL 1 — PLUS & MINUS
    ============================================================ */
@@ -84,8 +134,8 @@ const kapitel1 = [
     const a = z(2, 9), b = z(2, 9), e = a + b;
     return { frage: `${a} + ${b}`, antwort: e,
       optionen: optionen(e, [e + 1, e - 1, e + 2], 3),
-      hinweis: `Zähl von ${a} aus ${b} weiter.`,
-      hinweisBild: punkteFeld(1, a) + `<div style="height:6px"></div>` + punkteFeld(1, b) };
+      hinweis: `${a} blaue Punkte, ${b} gelbe dazu. Zusammen ${e}.`,
+      bild: zwanzigerFeld(a, b) };
   },
   // Stufe 2: zweistellig ± einstellig
   () => {
@@ -94,11 +144,13 @@ const kapitel1 = [
       const zehner = z(1, 8) * 10, einer = z(1, 5), b = z(2, 4);
       const a = zehner + einer, e = a + b;
       return { frage: `${a} + ${b}`, antwort: e, optionen: optionen(e, [e + 1, e - 1, e + 10], 3),
-        hinweis: `Die ${zehner} bleibt. Rechne nur ${einer} + ${b} = ${einer + b}.` };
+        hinweis: `Die ${zehner} bleibt stehen. Rechne nur ${einer} + ${b} = ${einer + b}.`,
+        hinweisBild: zahlenstrahl(zehner, zehner + 10, a, e) };
     }
     const a = z(25, 89), b = z(2, 5), e = a - b;
     return { frage: `${a} − ${b}`, antwort: e, optionen: optionen(e, [e + 1, e - 1, a + b], 3),
-      hinweis: `Zähl von ${a} aus ${b} rückwärts.` };
+      hinweis: `Geh von ${a} aus ${b} Schritte zurück.`,
+      hinweisBild: zahlenstrahl(Math.floor(e / 10) * 10, Math.floor(e / 10) * 10 + 10, a, e) };
   },
   // Stufe 3: zweistellig ± zweistellig
   () => {
@@ -197,7 +249,8 @@ const kapitel3 = [
     const e = z(2, 9), c = e * 100;
     return { frage: `${c} Cent sind wie viel Euro?`, antwort: `${e} €`,
       optionen: textOptionen(`${e} €`, [`${e + 1} €`, `${e - 1} €`, `${c} €`, `${e * 10} €`]),
-      hinweis: `100 Cent = 1 €. Also sind ${c} Cent genau ${e} €.` };
+      hinweis: `100 Cent sind 1 €.\nAlso sind ${c} Cent genau ${e} €.`,
+      hinweisBild: muenzen(e, 0) };
   },
   // Stufe 2: Euro und Cent gemischt
   () => {
@@ -225,7 +278,7 @@ const kapitel3 = [
     const gesamt = sH * 60 + sM + dauer;
     const eh = Math.floor(gesamt / 60) % 24, em = gesamt % 60;
     const fmt = (h, m) => `${h}:${String(m).padStart(2, "0")} Uhr`;
-    return { frage: `Der Film startet um ${fmt(sH, sM)} und dauert ${dauer} Minuten.\nWann ist er zu Ende?`,
+    return { frage: `Der Film startet um ${fmt(sH, sM)}.\nEr dauert ${dauer} Minuten.\nWann ist er zu Ende?`,
       antwort: fmt(eh, em),
       optionen: textOptionen(fmt(eh, em), [fmt(eh + 1, em), fmt(eh - 1, em), fmt(eh, (em + 30) % 60)]),
       hinweis: `${dauer} Minuten sind ${Math.floor(dauer / 60)} Stunde(n) und ${dauer % 60} Minuten.` };
@@ -234,7 +287,7 @@ const kapitel3 = [
   () => {
     if (Math.random() < 0.5) {
       const anz = z(2, 5), preis = z(2, 9) * 50 + 49, e = anz * preis;
-      return { frage: `Du kaufst ${anz} Energydrinks für je ${eur(preis)}.\nWas kostet das zusammen?`,
+      return { frage: `Du kaufst ${anz} Energydrinks.\nEiner kostet ${eur(preis)}.\nWas kostet alles zusammen?`,
         antwort: eur(e),
         optionen: textOptionen(eur(e), [eur(e + 100), eur(e - 100), eur(preis * (anz + 1)), eur(e + preis)]),
         hinweis: `Rechne erst mit den vollen Euro, dann mit den Cent.` };
@@ -242,7 +295,7 @@ const kapitel3 = [
     const preis = z(3, 17) * 100 + w([0, 50, 20, 90]);
     const gegeben = Math.ceil(preis / 500) * 500 + w([0, 500]);
     const e = gegeben - preis;
-    return { frage: `Die Rechnung ist ${eur(preis)}.\nDu zahlst mit ${eur(gegeben)}.\nWie viel bekommst du zurück?`,
+    return { frage: `Die Rechnung ist ${eur(preis)}.\nDu gibst ${eur(gegeben)}.\nWie viel bekommst du zurück?`,
       antwort: eur(e),
       optionen: textOptionen(eur(e), [eur(e + 100), eur(e - 100), eur(e + 50), eur(preis)]),
       hinweis: `Zähl von ${eur(preis)} hoch bis ${eur(gegeben)}.` };
@@ -256,7 +309,7 @@ const kapitel4 = [
   // Stufe 1: ein Schritt, sehr kleine Zahlen
   () => {
     const leute = z(2, 4), proPerson = z(2, 3), stueck = leute * proPerson;
-    return { frage: `Ihr seid ${leute} Leute und teilt euch ${stueck} Pizzastücke gerecht auf.\nWie viele bekommt jede Person?`,
+    return { frage: `Ihr seid ${leute} Leute.\nIhr habt ${stueck} Pizzastücke.\nJede Person bekommt gleich viel.\nWie viele sind das?`,
       antwort: proPerson, optionen: optionen(proPerson, [proPerson + 1, proPerson - 1, leute], 2),
       hinweis: `${stueck} Stücke auf ${leute} Personen verteilen: ${stueck} : ${leute}.`,
       hinweisBild: punkteFeld(leute, proPerson) };
@@ -265,7 +318,7 @@ const kapitel4 = [
   () => {
     const tage = z(4, 7), minuten = z(20, 60);
     const e = tage * minuten;
-    return { frage: `Du bist ${tage} Tage die Woche je ${minuten} Minuten im Bus.\nWie viele Minuten sind das pro Woche?`,
+    return { frage: `Du fährst ${tage} Tage pro Woche Bus.\nJede Fahrt dauert ${minuten} Minuten.\nWie lange fährst du in einer Woche?`,
       antwort: e, optionen: optionen(e, [e + minuten, e - minuten, tage + minuten], 15),
       hinweis: `${tage} · ${minuten}. Rechne erst ${tage} · ${Math.floor(minuten / 10) * 10}, dann den Rest.` };
   },
@@ -273,7 +326,7 @@ const kapitel4 = [
   () => {
     const start = z(30, 60), aus = z(8, 20), ein = z(5, 15);
     const e = start - aus + ein;
-    return { frage: `Im Bus sitzen ${start} Leute.\nAn der Haltestelle steigen ${aus} aus und ${ein} ein.\nWie viele sind jetzt drin?`,
+    return { frage: `Im Bus sitzen ${start} Leute.\n${aus} steigen aus.\n${ein} steigen ein.\nWie viele sind jetzt im Bus?`,
       antwort: e, optionen: optionen(e, [start - aus, start + ein, start - aus - ein], 4),
       hinweis: `Erst abziehen: ${start} − ${aus} = ${start - aus}. Dann ${ein} dazu.` };
   },
@@ -281,7 +334,7 @@ const kapitel4 = [
   () => {
     const woche = z(5, 15), wochen = z(4, 10), gespart = woche * wochen;
     const ziel = gespart + z(10, 40), e = ziel - gespart;
-    return { frage: `Du sparst ${woche} € pro Woche, seit ${wochen} Wochen.\nDie Kopfhörer kosten ${ziel} €.\nWie viel fehlt dir noch?`,
+    return { frage: `Du sparst ${woche} € pro Woche.\nDas machst du seit ${wochen} Wochen.\nDie Kopfhörer kosten ${ziel} €.\nWie viel fehlt noch?`,
       antwort: e, optionen: optionen(e, [ziel, gespart, e + 10], 6),
       hinweis: `Erst: ${woche} · ${wochen} = ${gespart} € gespart. Dann ${ziel} − ${gespart}.` };
   },
@@ -289,7 +342,7 @@ const kapitel4 = [
   () => {
     const pack = z(3, 6), proPack = z(6, 12), verteilt = z(2, 5);
     const gesamt = pack * proPack, e = gesamt - verteilt;
-    return { frage: `Du kaufst ${pack} Packungen mit je ${proPack} Riegeln.\nDu verschenkst ${verteilt} davon.\nWie viele hast du noch?`,
+    return { frage: `Du kaufst ${pack} Packungen.\nIn jeder sind ${proPack} Riegel.\nDu verschenkst ${verteilt} Riegel.\nWie viele hast du noch?`,
       antwort: e, optionen: optionen(e, [gesamt, gesamt + verteilt, gesamt - pack], 5),
       hinweis: `Erst alle zählen: ${pack} · ${proPack} = ${gesamt}. Dann ${verteilt} abziehen.` };
   }
@@ -346,7 +399,7 @@ const kapitel5 = [
     }
     const p = w([10, 20, 25, 50]), preis = z(4, 16) * 10;
     const rabatt = preis * p / 100, e = preis - rabatt;
-    return { frage: `Die Jacke kostet ${preis} €.\nJetzt gibt es ${p} % Rabatt.\nWas kostet sie jetzt?`,
+    return { frage: `Die Jacke kostet ${preis} €.\nEs gibt ${p} % Rabatt.\nWas kostet sie jetzt?`,
       antwort: e, optionen: optionen(e, [rabatt, preis - 10, preis], 6),
       hinweis: `${p} % von ${preis} € sind ${rabatt} €. Die ziehst du vom Preis ab.` };
   }
@@ -395,7 +448,7 @@ const kapitel6 = [
     }
     const anz = z(3, 7), preis = z(3, 9) * 100 + 95;
     const e = anz * Math.round(preis / 100) * 100;
-    return { frage: `Du legst ${anz} Artikel zu je ${eur(preis)} in den Wagen.\nUngefähr wie viel zahlst du?`,
+    return { frage: `Du legst ${anz} Artikel in den Wagen.\nJeder kostet ${eur(preis)}.\nUngefähr wie viel zahlst du?`,
       antwort: eur(e),
       optionen: textOptionen(eur(e), [eur(e + 500), eur(e - 500), eur(preis * (anz + 1)), eur(e + 100)]),
       hinweis: `${eur(preis)} ist fast ${eur(Math.round(preis / 100) * 100)}. Also ${anz} · ${Math.round(preis / 100)} €.` };

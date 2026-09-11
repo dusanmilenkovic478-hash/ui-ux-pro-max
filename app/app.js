@@ -31,6 +31,10 @@ const leererStand = () => ({
   stats: {},                 // "k0s1" -> { versuche, richtig }
   jokerWoche: wochenSchluessel(),
   jokerBenutzt: 0,
+  wocheSchluessel: wochenSchluessel(),
+  wocheThemen: {},                       // "kapitel|stufe" -> wie oft geübt
+  testWoche: { woche: wochenSchluessel(), versuche: 0, bestanden: false, eingeloest: false },
+  lesehilfe: null,                       // null = Vorgabe aus config.js
   aktuellK: 0,
   aktuellL: 1
 });
@@ -47,6 +51,8 @@ function laden() {
         // Felder ergänzen, die es in Version 1 noch nicht gab
         if (!Array.isArray(stand.crewHabe)) stand.crewHabe = [];
         if (!stand.stats || typeof stand.stats !== "object") stand.stats = {};
+        if (!stand.wocheThemen || typeof stand.wocheThemen !== "object") stand.wocheThemen = {};
+        if (!stand.testWoche) stand.testWoche = { woche: wochenSchluessel(), versuche: 0, bestanden: false, eingeloest: false };
       }
     }
   } catch (e) { /* kein Speicher verfügbar — läuft trotzdem, merkt sich nur nichts */ }
@@ -55,6 +61,11 @@ function laden() {
   if (stand.heuteDatum !== heuteDatum()) { stand.heuteDatum = heuteDatum(); stand.heuteZahl = 0; }
   // Wochenwechsel: Joker wieder aufladen
   if (stand.jokerWoche !== wochenSchluessel()) { stand.jokerWoche = wochenSchluessel(); stand.jokerBenutzt = 0; }
+  // Neue Woche: geübte Themen und Testergebnis zurücksetzen
+  if (stand.wocheSchluessel !== wochenSchluessel()) { stand.wocheSchluessel = wochenSchluessel(); stand.wocheThemen = {}; }
+  if (!stand.testWoche || stand.testWoche.woche !== wochenSchluessel())
+    stand.testWoche = { woche: wochenSchluessel(), versuche: 0, bestanden: false, eingeloest: false };
+  setzeLesehilfe(stand.lesehilfe === null ? !!CONFIG.lesehilfe : stand.lesehilfe, false);
   pruefeStreak();
 }
 
@@ -74,12 +85,12 @@ function pruefeStreak() {
 }
 
 /* ---------- Screens ---------- */
-const SCREENS = ["s-start", "s-quiz", "s-level", "s-kapitelende", "s-album", "s-eltern"];
+const SCREENS = ["s-start", "s-quiz", "s-level", "s-kapitelende", "s-album", "s-eltern", "s-testende"];
 function zeigeScreen(id) {
   SCREENS.forEach(s => $(s).hidden = (s !== id));
   window.scrollTo({ top: 0, behavior: "instant" });
 }
-function heim() { zeichneStart(); zeigeScreen("s-start"); }
+function heim() { if (window.speechSynthesis) speechSynthesis.cancel(); zeichneStart(); zeigeScreen("s-start"); }
 
 /* ---------- Farbe & Hintergrund ---------- */
 const FARBVAR = { rot:"--k1", orange:"--k2", gelb:"--k3", gruen:"--k4", blau:"--k5", violett:"--k6" };
@@ -97,12 +108,101 @@ function setzeAkzent(kapitelIndex) {
   feld.style.opacity = String((CONFIG.bilderDeckkraft ?? 0.22) * (kapitelIndex === null ? 0.7 : 1));
 }
 
+
+/* ============================================================
+   VORLESEN — die wichtigste Hilfe bei LRS.
+   Nutzt die Stimme des Betriebssystems, braucht kein Internet.
+   ============================================================ */
+const ZAHLWORT = ["null","ein","zwei","drei","vier","fünf","sechs","sieben","acht","neun","zehn","elf","zwölf"];
+const NENNER = { 2:"Halbe", 3:"Drittel", 4:"Viertel", 5:"Fünftel", 6:"Sechstel", 8:"Achtel", 10:"Zehntel" };
+
+/* Macht aus Mathe-Schreibweise etwas, das eine Sprachausgabe richtig liest */
+function sprechText(t) {
+  let s = String(t);
+  const istUhrzeit = /Uhr/.test(s);
+
+  // Brüche: 3/4 -> "drei Viertel"
+  s = s.replace(/(\d+)\/(\d+)/g, (treffer, zStr, nStr) => {
+    const zahl = Number(zStr), nenner = Number(nStr);
+    if (!NENNER[nenner] || zahl > 12) return `${zStr} durch ${nStr}`;
+    const wort = ZAHLWORT[zahl] || zStr;
+    return zahl === 1 ? `ein ${NENNER[nenner]}` : `${wort} ${NENNER[nenner]}`;
+  });
+
+  // Geldbeträge: 2,50 € -> "2 Euro 50", 0,80 € -> "80 Cent"
+  s = s.replace(/(\d+),(\d{2})\s*€/g, (tr, e, c) => {
+    const cent = Number(c);
+    if (Number(e) === 0) return `${cent} Cent`;
+    return cent === 0 ? `${e} Euro` : `${e} Euro ${cent}`;
+  });
+
+  if (istUhrzeit) s = s.replace(/(\d{1,2}):(\d{2})(\s*Uhr)?/g, "$1 Uhr $2");
+  else s = s.replace(/(\d)\s*:\s*(\d)/g, "$1 geteilt durch $2");
+
+  return s
+    .replace(/☐/g, " wie viel ")
+    .replace(/\s\+\s/g, " plus ")
+    .replace(/\s[−–-]\s/g, " minus ")
+    .replace(/\s[·*×]\s/g, " mal ")
+    .replace(/%/g, " Prozent")
+    .replace(/€/g, " Euro")
+    .replace(/\bkg\b/g, "Kilogramm").replace(/\bg\b/g, "Gramm")
+    .replace(/\bcm\b/g, "Zentimeter").replace(/\bm\b/g, "Meter")
+    .replace(/\bct\b/g, "Cent")
+    .replace(/([.!?])\s*\n\s*/g, "$1 ")
+    .replace(/\n/g, ". ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+let deutscheStimme = null;
+function holeStimme() {
+  if (deutscheStimme || !window.speechSynthesis) return deutscheStimme;
+  const alle = speechSynthesis.getVoices() || [];
+  deutscheStimme = alle.find(v => /^de/i.test(v.lang)) || null;
+  return deutscheStimme;
+}
+if (window.speechSynthesis) speechSynthesis.onvoiceschanged = () => { deutscheStimme = null; holeStimme(); };
+
+function vorlesen(text) {
+  const knopf = $("btn-hoeren");
+  if (!window.speechSynthesis) {
+    if (knopf) knopf.title = "Vorlesen geht auf diesem Gerät leider nicht";
+    return;
+  }
+  if (speechSynthesis.speaking) { speechSynthesis.cancel(); if (knopf) knopf.classList.remove("laeuft"); return; }
+  const rede = new SpeechSynthesisUtterance(sprechText(text));
+  rede.lang = "de-DE";
+  rede.rate = 0.88;          // etwas langsamer — hilft beim Mitlesen
+  const stimme = holeStimme();
+  if (stimme) rede.voice = stimme;
+  if (knopf) {
+    knopf.classList.add("laeuft");
+    rede.onend = rede.onerror = () => knopf.classList.remove("laeuft");
+  }
+  speechSynthesis.speak(rede);
+}
+
+/* Lesehilfe: größere Schrift, mehr Abstand zwischen Buchstaben */
+function setzeLesehilfe(an, sichern_ = true) {
+  document.documentElement.dataset.lesehilfe = an ? "an" : "aus";
+  stand.lesehilfe = !!an;
+  const knopf = $("btn-lesehilfe");
+  if (knopf) knopf.textContent = an ? "Aa Lesehilfe ✓" : "Aa Lesehilfe";
+  if (sichern_) sichern();
+}
+
 /* ---------- Statistik ---------- */
 function merkeStat(kapitel, stufe, richtig) {
   const s = `k${kapitel}s${stufe}`;
   if (!stand.stats[s]) stand.stats[s] = { versuche: 0, richtig: 0 };
   stand.stats[s].versuche++;
   if (richtig) stand.stats[s].richtig++;
+
+  // Für den Wochentest merken, was diese Woche geübt wurde
+  if (stand.wocheSchluessel !== wochenSchluessel()) { stand.wocheSchluessel = wochenSchluessel(); stand.wocheThemen = {}; }
+  const t = `${kapitel}|${stufe}`;
+  stand.wocheThemen[t] = (stand.wocheThemen[t] || 0) + 1;
 }
 
 /* ---------- Startbildschirm ---------- */
@@ -144,6 +244,8 @@ function zeichneStart() {
   $("fuss-text").textContent = offen
     ? `${offen} Gutschein${offen > 1 ? "e" : ""} noch nicht eingelöst · Ziel: ${tagesZiel} Aufgaben am Tag`
     : `Ziel: ${tagesZiel} richtige Aufgaben am Tag — das sind 2 % Fortschritt.`;
+
+  zeichneTestKachel();
 
   const liste = $("kapitel-liste");
   liste.innerHTML = "";
@@ -191,10 +293,12 @@ function starteLevel(kIndex, level) {
   naechsteAufgabe();
 }
 
+const durchgangLaenge = () => (quiz && quiz.istTest) ? CONFIG.wochentest.aufgaben : CONFIG.aufgabenProLevel;
+
 function zeichneSpur() {
   const spur = $("spur");
   spur.innerHTML = "";
-  for (let i = 0; i < CONFIG.aufgabenProLevel; i++) {
+  for (let i = 0; i < durchgangLaenge(); i++) {
     const s = document.createElement("span");
     if (i < quiz.ergebnisse.length) s.className = quiz.ergebnisse[i] ? "ok" : "nein";
     else if (i === quiz.ergebnisse.length) s.className = "jetzt";
@@ -207,10 +311,13 @@ function naechsteAufgabe() {
   const nr = quiz.ergebnisse.length;
 
   // Falsch beantwortete Aufgaben kommen gezielt zurück
-  const faellig = quiz.warteschlange.findIndex(e => e.faelligBei <= nr);
+  const faellig = quiz.istTest ? -1 : quiz.warteschlange.findIndex(e => e.faelligBei <= nr);
   if (faellig >= 0) {
     quiz.aufgabe = quiz.warteschlange.splice(faellig, 1)[0].aufgabe;
     quiz.istWiederholung = true;
+  } else if (quiz.istTest) {
+    quiz.aufgabe = quiz.testPlan[nr];
+    quiz.istWiederholung = false;
   } else {
     quiz.aufgabe = holeAufgabe(quiz.k, quiz.stufe);
     quiz.istWiederholung = false;
@@ -227,6 +334,10 @@ function naechsteAufgabe() {
   const bildBox = $("bild-box");
   bildBox.innerHTML = quiz.aufgabe.bild || "";
   bildBox.hidden = !quiz.aufgabe.bild;
+
+  $("btn-hoeren").hidden = !CONFIG.vorlesen;
+  $("btn-hoeren").classList.remove("laeuft");
+  if (window.speechSynthesis) speechSynthesis.cancel();
 
   $("blase").hidden = true;
   $("quiz-weiter").hidden = true;
@@ -265,8 +376,8 @@ function antworte(knopf, gewaehlt) {
       stand.letzterSpieltag = heuteDatum();
     }
 
-    // Ausgleich: nach 3 Treffern zurück auf die volle Level-Stufe
-    if (quiz.richtigSerie >= 3 && quiz.stufe < quiz.level) { quiz.stufe++; quiz.richtigSerie = 0; }
+    // Ausgleich: nach 3 Treffern zurück auf die volle Level-Stufe (im Test nicht)
+    if (!quiz.istTest && quiz.richtigSerie >= 3 && quiz.stufe < quiz.level) { quiz.stufe++; quiz.richtigSerie = 0; }
 
     zeigeBlase(true, w(CONFIG.lobRichtig), null, null);
   } else {
@@ -275,11 +386,11 @@ function antworte(knopf, gewaehlt) {
     quiz.fehlerSerie++;
     quiz.richtigSerie = 0;
 
-    // Ausgleich: nach 2 Fehlern wird die nächste Aufgabe leichter
-    if (quiz.fehlerSerie >= 2 && quiz.stufe > 1) { quiz.stufe--; quiz.fehlerSerie = 0; }
+    // Ausgleich: nach 2 Fehlern wird die nächste Aufgabe leichter (im Test nicht)
+    if (!quiz.istTest && quiz.fehlerSerie >= 2 && quiz.stufe > 1) { quiz.stufe--; quiz.fehlerSerie = 0; }
 
     // Diese Aufgabe kommt später noch zweimal zurück
-    if (!quiz.istWiederholung) {
+    if (!quiz.istWiederholung && !quiz.istTest) {
       const nr = quiz.ergebnisse.length;
       quiz.warteschlange.push({ aufgabe: quiz.aufgabe, faelligBei: nr + 3 });
       quiz.warteschlange.push({ aufgabe: quiz.aufgabe, faelligBei: nr + 8 });
@@ -295,7 +406,8 @@ function antworte(knopf, gewaehlt) {
   sichern();
 
   $("quiz-weiter").hidden = false;
-  $("btn-naechste").textContent = quiz.ergebnisse.length >= CONFIG.aufgabenProLevel ? "LEVEL AUSWERTEN ▶" : "WEITER ▶";
+  $("btn-naechste").textContent = quiz.ergebnisse.length >= durchgangLaenge()
+    ? (quiz.istTest ? "TEST AUSWERTEN ▶" : "LEVEL AUSWERTEN ▶") : "WEITER ▶";
   $("btn-naechste").focus({ preventScroll: true });
 }
 
@@ -398,6 +510,142 @@ function pinPruefen() {
     $("pin-input").value = "";
   } else {
     $("pin-meldung").textContent = "Das war nicht die richtige PIN. Nochmal?";
+  }
+}
+
+
+/* ============================================================
+   WOCHENTEST — sonntags, über das, was die Woche geübt wurde
+   ============================================================ */
+const WOCHENTAGE = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+
+function testStatus() {
+  const cfg = CONFIG.wochentest;
+  const tw = stand.testWoche;
+  const istTestTag = new Date().getDay() === cfg.tag;
+  const versucheFrei = Math.max(0, cfg.versucheProWoche - tw.versuche);
+  return {
+    istTestTag, bestanden: tw.bestanden, versucheFrei,
+    spielbar: istTestTag && !tw.bestanden && versucheFrei > 0,
+    tagName: WOCHENTAGE[cfg.tag]
+  };
+}
+
+/* Welche Themen kommen dran? Was diese Woche geübt wurde —
+   und wenn nichts geübt wurde, alles bisher Freigeschaltete. */
+function testThemen() {
+  const geuebt = Object.entries(stand.wocheThemen || {})
+    .filter(([, anzahl]) => anzahl >= 3)
+    .map(([s]) => s.split("|").map(Number));
+  if (geuebt.length) return geuebt;
+
+  const alle = [];
+  KAPITEL.forEach((k, i) => {
+    const bis = Math.max(1, stand.kapitel[i].levelFertig);
+    for (let st = 1; st <= bis; st++) alle.push([i, st]);
+  });
+  return alle.length ? alle : [[0, 1]];
+}
+
+function zeichneTestKachel() {
+  const st = testStatus();
+  const k = $("test-kachel");
+  const anzahlThemen = new Set(testThemen().map(t => t[0])).size;
+  k.classList.remove("bereit", "fertig", "ruht");
+  k.disabled = !st.spielbar;
+
+  if (st.bestanden) {
+    k.classList.add("fertig");
+    $("tk-icon").textContent = "🏆";
+    $("tk-titel").textContent = "Wochentest bestanden!";
+    $("tk-unter").textContent = `Belohnung: ${CONFIG.wochentest.belohnung}`;
+    $("tk-pfeil").textContent = "✓";
+  } else if (st.spielbar) {
+    k.classList.add("bereit");
+    $("tk-icon").textContent = "🎮";
+    $("tk-titel").textContent = "Der Wochentest ist da!";
+    $("tk-unter").textContent = `${CONFIG.wochentest.aufgaben} Aufgaben aus `
+      + (anzahlThemen === 1 ? "einem Thema" : `${anzahlThemen} Themen`)
+      + ` dieser Woche · Belohnung: ${CONFIG.wochentest.belohnung}`;
+    $("tk-pfeil").textContent = "▶";
+  } else if (st.istTestTag && st.versucheFrei === 0) {
+    k.classList.add("ruht");
+    $("tk-icon").textContent = "😮‍💨";
+    $("tk-titel").textContent = "Heute keine Versuche mehr";
+    $("tk-unter").textContent = `Nächsten ${st.tagName} gibt es einen neuen Test.`;
+    $("tk-pfeil").textContent = "";
+  } else {
+    k.classList.add("ruht");
+    $("tk-icon").textContent = "📅";
+    $("tk-titel").textContent = `Wochentest am ${st.tagName}`;
+    $("tk-unter").textContent = `Übe unter der Woche — genau das kommt im Test dran. Belohnung: ${CONFIG.wochentest.belohnung}`;
+    $("tk-pfeil").textContent = "";
+  }
+}
+
+function starteTest() {
+  if (!testStatus().spielbar) return;
+  const themen = mische(testThemen());
+  const plan = [];
+  for (let i = 0; i < CONFIG.wochentest.aufgaben; i++) {
+    const [k, st] = themen[i % themen.length];
+    plan.push(holeAufgabe(k, st));
+  }
+  quiz = {
+    istTest: true, k: plan[0].kapitel, level: 0, stufe: 0,
+    testPlan: plan, richtig: 0, fehlerSerie: 0, richtigSerie: 0,
+    ergebnisse: [], warteschlange: [], aufgabe: null,
+    istWiederholung: false, beantwortet: false
+  };
+  stand.testWoche.versuche++;
+  sichern();
+  setzeAkzent(null);
+  $("q-kapitel").textContent = "Wochentest";
+  $("q-level").textContent = `${CONFIG.wochentest.aufgaben} Aufgaben · ab ${CONFIG.wochentest.richtigeZumBestehen} bestanden`;
+  zeigeScreen("s-quiz");
+  naechsteAufgabe();
+}
+
+function werteTestAus() {
+  const cfg = CONFIG.wochentest;
+  const bestanden = quiz.richtig >= cfg.richtigeZumBestehen;
+  setzeAkzent(null);
+  $("test-bilanz").textContent = `${quiz.richtig} von ${cfg.aufgaben} richtig`;
+
+  if (bestanden) {
+    stand.testWoche.bestanden = true;
+    $("test-titel").textContent = "Bestanden!";
+    $("test-gutschein").hidden = false;
+    $("test-pin-block").hidden = false;
+    $("test-belohnung").textContent = cfg.belohnung;
+    $("test-code").textContent = `ROBLOX-${stand.testWoche.woche}`;
+    $("test-stempel").hidden = !stand.testWoche.eingeloest;
+    $("test-pin").value = "";
+    $("test-pin-meldung").textContent = "";
+    $("btn-test-nochmal").hidden = true;
+    konfetti();
+  } else {
+    const frei = Math.max(0, cfg.versucheProWoche - stand.testWoche.versuche);
+    $("test-titel").textContent = "Diesmal nicht ganz";
+    $("test-gutschein").hidden = true;
+    $("test-pin-block").hidden = true;
+    $("test-bilanz").textContent =
+      `${quiz.richtig} von ${cfg.aufgaben} richtig — du brauchst ${cfg.richtigeZumBestehen}. `
+      + (frei > 0 ? `Du hast noch ${frei} Versuch${frei > 1 ? "e" : ""}.` : `Nächste Woche gibt es einen neuen Test.`);
+    $("btn-test-nochmal").hidden = frei === 0;
+  }
+  sichern();
+  zeigeScreen("s-testende");
+}
+
+function testPinPruefen() {
+  if ($("test-pin").value.trim() === String(CONFIG.elternPin)) {
+    stand.testWoche.eingeloest = true; sichern();
+    $("test-stempel").hidden = false;
+    $("test-pin-meldung").textContent = "✓ Eingelöst. Viel Spaß!";
+    $("test-pin").value = "";
+  } else {
+    $("test-pin-meldung").textContent = "Das war nicht die richtige PIN. Nochmal?";
   }
 }
 
@@ -522,8 +770,10 @@ function sterne() {
 /* ---------- Knöpfe ---------- */
 function verdrahten() {
   $("btn-weiter").addEventListener("click", () => { const z = naechstesOffenes(); starteLevel(z.k, z.l); });
-  $("btn-naechste").addEventListener("click", () =>
-    quiz.ergebnisse.length >= CONFIG.aufgabenProLevel ? werteLevelAus() : naechsteAufgabe());
+  $("btn-naechste").addEventListener("click", () => {
+    if (quiz.ergebnisse.length < durchgangLaenge()) return naechsteAufgabe();
+    return quiz.istTest ? werteTestAus() : werteLevelAus();
+  });
 
   $("btn-pause").addEventListener("click", () => { $("pause-overlay").hidden = false; $("btn-fortsetzen").focus(); });
   $("btn-fortsetzen").addEventListener("click", () => $("pause-overlay").hidden = true);
@@ -534,6 +784,14 @@ function verdrahten() {
 
   $("btn-level-heim").addEventListener("click", heim);
   $("btn-ende-heim").addEventListener("click", heim);
+
+  $("btn-hoeren").addEventListener("click", () => vorlesen(quiz.aufgabe.frage));
+  $("test-kachel").addEventListener("click", starteTest);
+  $("btn-test-pin").addEventListener("click", testPinPruefen);
+  $("test-pin").addEventListener("keydown", e => { if (e.key === "Enter") testPinPruefen(); });
+  $("btn-test-nochmal").addEventListener("click", starteTest);
+  $("btn-test-heim").addEventListener("click", heim);
+  $("btn-lesehilfe").addEventListener("click", () => setzeLesehilfe(document.documentElement.dataset.lesehilfe !== "an"));
 
   $("btn-album").addEventListener("click", zeichneAlbum);
   $("btn-album-zurueck").addEventListener("click", heim);

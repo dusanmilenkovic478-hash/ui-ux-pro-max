@@ -281,6 +281,42 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 .tab-wrap{overflow-x:auto}
 .knopf-reihe{display:flex;gap:9px;margin-top:var(--sp);flex-wrap:wrap;justify-content:center}
 
+
+/* ===== VORLESEN ===== */
+.hoer{
+  position:absolute;top:9px;right:10px;z-index:3;
+  width:40px;height:40px;border-radius:11px;display:grid;place-content:center;font-size:1.1rem;
+  background:var(--panel-hoch);border:2px solid #0A0714;box-shadow:2px 3px 0 #0A0714;
+}
+.hoer:hover{background:var(--rand)}
+.hoer:active{transform:translate(2px,3px);box-shadow:0 0 0 #0A0714}
+.hoer.laeuft{background:var(--akzent);color:#120C22;animation:puls 1s ease-in-out infinite}
+
+/* ===== LESEHILFE (LRS): größer, luftiger, mehr Buchstabenabstand ===== */
+html[data-lesehilfe="an"] body{font-size:17.5px}
+html[data-lesehilfe="an"] .aufgabe-text{letter-spacing:.045em;line-height:1.45;word-spacing:.12em}
+html[data-lesehilfe="an"] .aufgabe-text.lang{font-size:clamp(1.12rem,4.6vw,1.42rem);line-height:1.62}
+html[data-lesehilfe="an"] .antwort{letter-spacing:.035em}
+html[data-lesehilfe="an"] .blase p{font-size:1rem;letter-spacing:.035em;line-height:1.72;word-spacing:.1em}
+html[data-lesehilfe="an"] .kap-unter,html[data-lesehilfe="an"] .leise{font-size:.9rem;letter-spacing:.02em}
+html[data-lesehilfe="an"] .witz p{letter-spacing:.035em;line-height:1.7}
+
+/* ===== WOCHENTEST-KACHEL ===== */
+.test-kachel{
+  display:grid;grid-template-columns:50px 1fr auto;gap:13px;align-items:center;width:100%;text-align:left;
+  margin-top:var(--sp);padding:14px;border-radius:16px;
+  background:var(--panel);border:3px solid #0A0714;box-shadow:4px 5px 0 #0A0714;
+  border-left:7px solid var(--tk,var(--gedaempft));
+}
+.test-kachel.bereit{border-left-color:var(--k3);background:linear-gradient(100deg,color-mix(in srgb,var(--k3) 17%,var(--panel)),var(--panel))}
+.test-kachel.fertig{border-left-color:var(--richtig)}
+.test-kachel.ruht{opacity:.62}
+.test-kachel:disabled{cursor:default}
+.test-kachel .tk-icon{width:50px;height:50px;border-radius:13px;display:grid;place-content:center;font-size:1.5rem;background:var(--panel-hoch);border:2px solid #0A0714}
+.test-kachel .tk-titel{font-family:var(--f-disp);font-weight:800;font-size:1.06rem;display:block;line-height:1.2}
+.test-kachel .tk-unter{font-size:.8rem;color:var(--gedaempft);display:block;line-height:1.35;margin-top:2px}
+.test-kachel .tk-pfeil{font-family:var(--f-disp);font-weight:800;font-size:1.3rem;color:var(--k3)}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -337,11 +373,18 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
       </div>
     </header>
 
+    <button class="test-kachel" id="test-kachel">
+      <span class="tk-icon" id="tk-icon">📅</span>
+      <span><span class="tk-titel" id="tk-titel">Wochentest</span><span class="tk-unter" id="tk-unter">—</span></span>
+      <span class="tk-pfeil" id="tk-pfeil"></span>
+    </button>
+
     <p class="eyebrow" style="margin-top:26px">Die 6 Kapitel</p>
     <div class="kapitel-liste" id="kapitel-liste"></div>
 
     <div class="knopf-reihe">
       <button class="mini" id="btn-album">🃏 Album <span id="album-zahl"></span></button>
+      <button class="mini" id="btn-lesehilfe">Aa Lesehilfe</button>
       <button class="mini" id="btn-eltern">Für Eltern</button>
     </div>
     <p class="fuss" id="fuss-text"></p>
@@ -358,6 +401,7 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
     <div class="aufgabe" id="aufgabe-box">
       <div class="speed"></div>
       <span class="nochmal" id="nochmal-label" hidden>Nochmal</span>
+      <button class="hoer" id="btn-hoeren" title="Aufgabe vorlesen" aria-label="Aufgabe vorlesen">🔊</button>
       <p class="aufgabe-text" id="aufgabe-text">…</p>
       <div class="bild-box" id="bild-box" hidden></div>
     </div>
@@ -412,6 +456,36 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
       <div class="stapel">
         <button class="knopf" id="btn-ende-weiter">NÄCHSTES KAPITEL ▶</button>
         <button class="knopf zweit" id="btn-ende-heim">Zur Übersicht</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WOCHENTEST-ERGEBNIS ============ -->
+  <section id="s-testende" hidden>
+    <div class="panel mitte">
+      <p class="eyebrow" style="justify-content:center">Wochentest</p>
+      <h2 id="test-titel">—</h2>
+      <p class="leise" style="margin:8px 0 0" id="test-bilanz"></p>
+
+      <div class="gutschein" id="test-gutschein">
+        <p class="oben">Belohnung</p>
+        <p class="was" id="test-belohnung">—</p>
+        <span class="code" id="test-code">—</span>
+        <div class="eingeloest" id="test-stempel" hidden><span>EINGELÖST</span></div>
+      </div>
+
+      <div id="test-pin-block">
+        <p class="leise" style="margin:0">Zeig das Mama. Sie tippt die PIN ein.</p>
+        <div class="pin-feld">
+          <input id="test-pin" type="password" inputmode="numeric" maxlength="4" placeholder="PIN" autocomplete="off">
+          <button class="mini" id="btn-test-pin">Einlösen</button>
+        </div>
+        <p class="leise" id="test-pin-meldung" style="margin:8px 0 0;min-height:1.3em"></p>
+      </div>
+
+      <div class="stapel">
+        <button class="knopf" id="btn-test-nochmal" hidden>NOCHMAL VERSUCHEN ▶</button>
+        <button class="knopf zweit" id="btn-test-heim">Zur Übersicht</button>
       </div>
     </div>
   </section>

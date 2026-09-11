@@ -88,5 +88,27 @@ const CONFIG = {
   /* --- 10. STREAK-JOKER ------------------------------------
      So viele Tage darf pro Woche ausfallen, ohne dass die
      Serie reißt. 0 = kein Joker.                           */
-  jokerProWoche: 1
+  jokerProWoche: 1,
+
+  /* --- 11. WOCHENTEST -------------------------------------
+     Am Sonntag gibt es einen Test über das, was in der
+     Woche geübt wurde. Immer dieselbe Belohnung.
+     tag: 0 = Sonntag, 1 = Montag, … 6 = Samstag          */
+  wochentest: {
+    tag: 0,
+    aufgaben: 12,
+    richtigeZumBestehen: 8,
+    versucheProWoche: 2,
+    belohnung: "2 Stunden Roblox zocken"
+  },
+
+  /* --- 12. HILFEN BEI LRS ---------------------------------
+     vorlesen:  Lautsprecher-Knopf an jeder Aufgabe.
+                Nutzt die Stimme, die auf dem Laptop
+                installiert ist — braucht kein Internet.
+     lesehilfe: Größere Schrift und mehr Abstand zwischen
+                den Buchstaben. Malte kann das auch selbst
+                im Startbildschirm umschalten.             */
+  vorlesen: true,
+  lesehilfe: false
 };
