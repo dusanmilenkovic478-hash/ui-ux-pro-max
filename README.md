@@ -27,6 +27,9 @@ Dyskalkulie bleibt eine Lerntherapie der eigentliche Hebel.
   Aufgabe, teils erst als Hilfe nach einem Fehler.
 - **Eltern-Bereich hinter der PIN** mit Trefferquote je Kapitel und einem
   Hinweis, wo Nachhilfe ansetzen sollte.
+- **Sicherung.** Der Fortschritt lässt sich im Eltern-Bereich als Text
+  sichern und überall wieder einlesen — wichtig, weil der Browser ihn an
+  den Speicherort der Datei bindet.
 - **Wochentest.** Sonntags ein Test über das, was in der Woche geübt wurde.
   Bestanden gibt es immer dieselbe Belohnung; zwei Versuche pro Woche.
 - **Gutschein-System.** Jedes bestandene Level gibt einen Gutschein mit Code.

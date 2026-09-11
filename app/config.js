@@ -19,7 +19,7 @@ const CONFIG = {
      Sie verhindert versehentliches Mehrfach-Einlösen,
      sie ist kein echter Schutz vor jemandem, der die
      Datei öffnet.                                          */
-  elternPin: "1234",
+  elternPin: "0902",
 
   /* --- 3. TAGESZIEL ---------------------------------------
      20 richtige Antworten = 2 % Fortschritt pro Tag.

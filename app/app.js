@@ -884,6 +884,8 @@ function zeichneEltern(entsperrt) {
   });
 
   $("diagnose-text").textContent = sprachDiagnose();
+  $("sicherung-feld").value = "";
+  $("sicherung-meldung").textContent = "";
 
   const schwach = zeilen.filter(zl => zl.v >= 10 && zl.r / zl.v < 0.6);
   $("eltern-rat").textContent = gesamtV < 10
@@ -892,6 +894,71 @@ function zeichneEltern(entsperrt) {
       ? `Schwerpunkt für Nachhilfe: ${schwach.map(s => s.name).join(", ")} — hier liegt die Trefferquote unter 60 %.`
       : "Alle Themen liegen über 60 % Trefferquote. Kein Thema sticht negativ heraus.";
   zeigeScreen("s-eltern");
+}
+
+
+/* ============================================================
+   SICHERUNG — der Fortschritt liegt im Browser und hängt am
+   Speicherort der Datei. Wird der Ordner verschoben, findet der
+   Browser ihn nicht mehr. Damit das nicht schlimm ist, lässt er
+   sich als Text sichern und überall wieder einlesen.
+   ============================================================ */
+const SICHER_KOPF = "MALTE1:";
+
+function inText(objekt) {
+  const bytes = new TextEncoder().encode(JSON.stringify(objekt));
+  let roh = "";
+  for (const b of bytes) roh += String.fromCharCode(b);
+  return SICHER_KOPF + btoa(roh);
+}
+function ausText(text) {
+  const sauber = String(text).trim().replace(/\s+/g, "");
+  if (!sauber.startsWith(SICHER_KOPF)) throw new Error("Das ist kein Sicherungstext.");
+  const roh = atob(sauber.slice(SICHER_KOPF.length));
+  const bytes = Uint8Array.from(roh, c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+function sicherungErzeugen() {
+  const feld = $("sicherung-feld");
+  try {
+    feld.value = inText(stand);
+    feld.focus(); feld.select();
+    if (navigator.clipboard) navigator.clipboard.writeText(feld.value).catch(() => {});
+    $("sicherung-meldung").textContent =
+      "✓ Sicherung erzeugt und markiert. Mit Strg+C kopieren und in eine Textdatei einfügen.";
+  } catch (e) {
+    $("sicherung-meldung").textContent = "Die Sicherung konnte nicht erstellt werden.";
+  }
+}
+
+function sicherungEinlesen() {
+  const feld = $("sicherung-feld");
+  const meldung = $("sicherung-meldung");
+  if (!feld.value.trim()) { meldung.textContent = "Bitte zuerst den Sicherungstext einfügen."; return; }
+  let geladen;
+  try { geladen = ausText(feld.value); }
+  catch (e) { meldung.textContent = "Der Text ist unvollständig oder keine Sicherung. Bitte alles einfügen."; return; }
+
+  if (!geladen || !Array.isArray(geladen.kapitel)) { meldung.textContent = "Diese Sicherung passt nicht zur App."; return; }
+  const wieViel = geladen.richtigGesamt || 0;
+  if (!confirm(`Sicherung mit ${wieViel} richtigen Antworten einlesen?\n\nDer jetzige Fortschritt wird dabei ersetzt.`)) {
+    meldung.textContent = "Abgebrochen. Es wurde nichts verändert.";
+    return;
+  }
+
+  stand = Object.assign(leererStand(), geladen);
+  // Kapitel könnten aus einer Version mit weniger Kapiteln stammen
+  while (stand.kapitel.length < KAPITEL.length) stand.kapitel.push({ levelFertig: 0 });
+  stand.kapitel.length = KAPITEL.length;
+  if (!Array.isArray(stand.crewHabe)) stand.crewHabe = [];
+  if (!stand.stats || typeof stand.stats !== "object") stand.stats = {};
+  sichern();
+  // Erst neu zeichnen, dann die Bestätigung setzen — sonst löscht
+  // das Neuzeichnen sie sofort wieder weg.
+  zeichneEltern(true);
+  $("sicherung-meldung").textContent =
+    `✓ Eingelesen: ${stand.richtigGesamt} richtige Antworten, ${stand.crewHabe.length} Levels.`;
 }
 
 /* ---------- Konfetti ---------- */
@@ -978,6 +1045,9 @@ function verdrahten() {
       if (text.indexOf("Probiere") !== 0) $("btn-sprach-test").textContent = "Nochmal testen";
     });
   });
+
+  $("btn-sicher-erzeugen").addEventListener("click", sicherungErzeugen);
+  $("btn-sicher-einlesen").addEventListener("click", sicherungEinlesen);
 
   $("btn-album").addEventListener("click", zeichneAlbum);
   $("btn-album-zurueck").addEventListener("click", heim);

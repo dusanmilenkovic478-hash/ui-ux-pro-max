@@ -72,17 +72,37 @@ WAS SIE NOCH WISSEN SOLLTEN
 Braucht die App Internet?
     Nein. Sie läuft komplett offline.
 
-Wo wird der Fortschritt gespeichert?
-    Im Browser auf dem Laptop, nicht im Internet. Solange die App
-    aus demselben Ordner gestartet wird, bleibt alles erhalten.
-    Verschieben Sie den Ordner NICHT, sonst fängt der Fortschritt
-    von vorne an.
+Die PIN
+    Die PIN lautet 0902.
 
-Die PIN ändern
-    Die PIN steht noch auf 1234. Sagen Sie mir Ihre Wunsch-PIN,
-    dann baue ich sie ein und schicke die Datei neu. Ändern Sie
-    sie bitte nicht selbst in der HTML-Datei — da steht sie an
-    einer Stelle, die leicht zu übersehen ist.
+Wo wird der Fortschritt gespeichert?
+    Auf dem Laptop, nicht im Internet. Der Browser legt ihn in einem
+    Fach ab, dessen Name aus dem Speicherort der App gebildet wird.
+    Liegt die App also woanders, sucht der Browser im falschen Fach
+    und findet nichts — der Fortschritt sieht dann aus, als wäre er
+    weg. (Er ist es nicht: Kommt die App zurück an ihren alten Platz,
+    ist auch der Stand wieder da.)
+
+    Deshalb: nach dem Einrichten den Ordner nicht mehr verschieben
+    und nicht umbenennen. Falls es doch mal passiert, hilft die
+    Sicherung.
+
+Sicherung anlegen (empfohlen, dauert 20 Sekunden)
+    In der App unten auf "FÜR ELTERN", PIN eingeben. Dort steht
+    "Fortschritt sichern".
+
+    1. Auf "Sicherung erzeugen" klicken.
+       Der Text wird erzeugt, markiert und in die Zwischenablage
+       gelegt.
+    2. Mit Strg+V in eine Textdatei einfügen und speichern,
+       zum Beispiel als  Sicherung.txt  neben die App.
+
+    Wiederherstellen geht genauso rückwärts: Text kopieren, im
+    selben Feld einfügen, auf "Sicherung einlesen" klicken.
+
+    Das hilft nicht nur beim Verschieben, sondern auch wenn der
+    Browser aufgeräumt wird oder die App auf einen anderen Rechner
+    umziehen soll. Am besten einmal im Monat machen.
 
 Das Vorlesen prüfen
     In der App unten auf "FÜR ELTERN", PIN eingeben, ganz unten
