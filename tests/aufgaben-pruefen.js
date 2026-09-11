@@ -1,5 +1,6 @@
 const fs = require("fs");
-const quelle = fs.readFileSync("../app/aufgaben.js", "utf8");
+const pfad = require("path");
+const quelle = fs.readFileSync(pfad.join(__dirname, "..", "app", "aufgaben.js"), "utf8");
 const lade = new Function(quelle + "; return { KAPITEL, GRUPPEN, holeAufgabe };");
 const { KAPITEL, GRUPPEN, holeAufgabe } = lade();
 
