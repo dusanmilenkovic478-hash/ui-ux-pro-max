@@ -1,0 +1,311 @@
+<title>Malte's Life einrichten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,600;0,800;1,800&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --grund:#FCFBF8; --karte:#FFFFFF; --tinte:#241F33; --leise:#6B6480;
+  --linie:#E4DFEE; --akzent:#6D45E8; --akzent-sanft:#F0EAFE;
+  --warn-grund:#FFF6E3; --warn-linie:#F0CE7E; --warn-tinte:#6B4B06;
+  --ok-grund:#E8F8F0; --ok-linie:#8CD9B4; --ok-tinte:#14603C;
+  --s1:#E0357A; --s2:#E0702A; --s3:#C9A20C; --s4:#1E9E68; --s5:#1C83C4; --s6:#7B4DE0;
+  --f-d:"Kanit","Trebuchet MS",sans-serif;
+  --f-b:"M PLUS Rounded 1c","Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --grund:#141026; --karte:#1E1834; --tinte:#F2EEFB; --leise:#A79CC9;
+    --linie:#352B57; --akzent:#B79BFF; --akzent-sanft:#2A2150;
+    --warn-grund:#332608; --warn-linie:#8A6D1F; --warn-tinte:#FFD98A;
+    --ok-grund:#0F2E22; --ok-linie:#2E7A57; --ok-tinte:#8FE6BC;
+    --s1:#FF4D8D; --s2:#FF9142; --s3:#FFD84D; --s4:#3DDC97; --s5:#3BB8F5; --s6:#A78BFA;
+  }
+}
+:root[data-theme="dark"]{
+  --grund:#141026; --karte:#1E1834; --tinte:#F2EEFB; --leise:#A79CC9;
+  --linie:#352B57; --akzent:#B79BFF; --akzent-sanft:#2A2150;
+  --warn-grund:#332608; --warn-linie:#8A6D1F; --warn-tinte:#FFD98A;
+  --ok-grund:#0F2E22; --ok-linie:#2E7A57; --ok-tinte:#8FE6BC;
+  --s1:#FF4D8D; --s2:#FF9142; --s3:#FFD84D; --s4:#3DDC97; --s5:#3BB8F5; --s6:#A78BFA;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--grund); color:var(--tinte);
+  font-family:var(--f-b); font-size:16.5px; line-height:1.6;
+}
+.blatt{max-width:680px; margin-inline:auto; padding-inline:18px; padding-block:34px 60px}
+
+h1{
+  font-family:var(--f-d); font-weight:800; font-style:italic;
+  font-size:clamp(1.9rem,7vw,2.7rem); line-height:1.02; margin:0 0 8px;
+  text-wrap:balance; letter-spacing:-.015em;
+  background:linear-gradient(95deg,var(--s1),var(--s2) 22%,var(--s3) 42%,var(--s4) 62%,var(--s5) 80%,var(--s6));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.unter{color:var(--leise); font-size:1.02rem; margin:0 0 6px; text-wrap:balance}
+.dauer{
+  display:inline-flex; align-items:center; gap:7px; margin-top:10px;
+  font-family:var(--f-d); font-weight:600; font-size:.8rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--akzent); background:var(--akzent-sanft); padding:7px 13px; border-radius:99px;
+}
+
+/* ---- Schritte ---- */
+.schritt{
+  display:grid; grid-template-columns:52px 1fr; gap:16px; align-items:start;
+  background:var(--karte); border:1px solid var(--linie); border-radius:15px;
+  padding:19px; margin-top:15px;
+}
+.nr{
+  width:52px; height:52px; border-radius:14px; display:grid; place-content:center;
+  font-family:var(--f-d); font-weight:800; font-size:1.5rem; color:#fff; line-height:1;
+}
+.schritt:nth-of-type(6n+1) .nr{background:var(--s1)}
+.schritt:nth-of-type(6n+2) .nr{background:var(--s2)}
+.schritt:nth-of-type(6n+3) .nr{background:var(--s3); color:#3D2F00}
+.schritt:nth-of-type(6n+4) .nr{background:var(--s4)}
+.schritt:nth-of-type(6n+5) .nr{background:var(--s5)}
+.schritt:nth-of-type(6n+6) .nr{background:var(--s6)}
+.schritt h2{
+  font-family:var(--f-d); font-weight:800; font-size:1.16rem; line-height:1.25;
+  margin:5px 0 8px; text-wrap:balance;
+}
+.schritt p{margin:0 0 9px}
+.schritt p:last-child{margin-bottom:0}
+.schritt ol,.schritt ul{margin:0 0 9px; padding-left:20px}
+.schritt li{margin-bottom:5px}
+.schritt li:last-child{margin-bottom:0}
+.frei{color:var(--leise); font-size:.84rem; font-weight:500}
+
+/* ---- Klickpfad ---- */
+.pfad{
+  display:inline-block; background:var(--akzent-sanft); color:var(--akzent);
+  font-family:var(--f-d); font-weight:600; font-size:.94rem;
+  padding:3px 9px; border-radius:7px; margin:2px 0;
+}
+code{
+  background:var(--akzent-sanft); color:var(--akzent); padding:2px 7px; border-radius:6px;
+  font-family:ui-monospace,Consolas,monospace; font-size:.92em; font-weight:600;
+}
+
+/* ---- Ordnerbild ---- */
+.ordner{
+  background:var(--karte); border:1px solid var(--linie); border-radius:12px;
+  padding:15px 17px; margin:11px 0 0;
+  font-family:ui-monospace,Consolas,monospace; font-size:.8rem; line-height:1.9;
+  overflow-x:auto; white-space:pre;
+}
+.ordner b{color:var(--akzent); font-weight:700}
+.ordner i{color:var(--leise); font-style:normal; font-size:.92em}
+
+/* ---- Hinweiskästen ---- */
+.kasten{border-radius:13px; padding:15px 17px; margin-top:15px; border:1px solid}
+.kasten > b:first-child{font-family:var(--f-d); font-weight:800; display:block; margin-bottom:4px; font-size:1rem}
+.kasten p{margin:0 0 8px}
+.kasten p:last-child{margin-bottom:0}
+.warn{background:var(--warn-grund); border-color:var(--warn-linie); color:var(--warn-tinte)}
+.ok{background:var(--ok-grund); border-color:var(--ok-linie); color:var(--ok-tinte)}
+.warn code,.ok code{background:rgba(0,0,0,.07); color:inherit}
+
+/* ---- PIN ---- */
+.pin-karte{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  background:var(--karte); border:2px dashed var(--akzent); border-radius:15px;
+  padding:17px 19px; margin-top:15px;
+}
+.pin-zahl{
+  font-family:var(--f-d); font-weight:800; font-size:2.1rem; letter-spacing:.16em;
+  color:var(--akzent); font-variant-numeric:tabular-nums; line-height:1;
+}
+.pin-karte div{flex:1; min-width:190px}
+.pin-karte p{margin:0; font-size:.92rem; color:var(--leise)}
+
+h3{
+  font-family:var(--f-d); font-weight:800; font-size:1.28rem;
+  margin:38px 0 4px; text-wrap:balance;
+}
+h3 + p{margin-top:0; color:var(--leise)}
+.trenn{height:1px; background:var(--linie); border:0; margin:34px 0 0}
+
+table{width:100%; border-collapse:collapse; margin-top:13px; font-size:.94rem}
+th{
+  text-align:left; font-family:var(--f-d); font-weight:600; font-size:.72rem;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--leise);
+  padding:7px 10px; border-bottom:2px solid var(--linie);
+}
+td{padding:11px 10px; border-bottom:1px solid var(--linie); vertical-align:top}
+td:first-child{font-weight:700; white-space:nowrap}
+.tab-huelle{overflow-x:auto}
+
+.fuss{margin-top:36px; padding-top:20px; border-top:1px solid var(--linie); color:var(--leise); font-size:.88rem}
+@media (max-width:420px){
+  .schritt{grid-template-columns:1fr; gap:10px}
+  .nr{width:44px; height:44px; font-size:1.3rem}
+}
+@media print{
+  body{background:#fff; color:#000}
+  .schritt,.ordner,.kasten,.pin-karte{break-inside:avoid}
+}
+</style>
+
+<div class="blatt">
+
+  <h1>Malte's Life einrichten</h1>
+  <p class="unter">Alles, was Sie tun müssen — in acht Schritten. Es wird nichts in Windows eingetragen und nichts verändert. Die App ist ein Ordner, den man auch einfach wieder löschen kann.</p>
+  <span class="dauer">⏱ Etwa 5 Minuten</span>
+
+  <div class="schritt">
+    <span class="nr">1</span>
+    <div>
+      <h2>Die ZIP-Datei herunterladen</h2>
+      <p>Laden Sie <code>MaltesLife-Windows.zip</code> <b>direkt auf Maltes Laptop</b> herunter — nicht auf Ihren Arbeitsrechner und dann rüberkopieren. Das spart einen Umweg.</p>
+      <p class="frei">Wo sie landet, ist egal. Windows legt sie normalerweise im Ordner <b>Downloads</b> ab. Dort holen wir sie gleich wieder raus.</p>
+    </div>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">2</span>
+    <div>
+      <h2>Einen Ordner für die App anlegen</h2>
+      <p>Öffnen Sie den Explorer (das gelbe Ordnersymbol unten in der Leiste), klicken Sie links auf <b>Dieser PC</b> und doppelt auf <b>Windows (C:)</b>.</p>
+      <p>Dann Rechtsklick auf eine freie Fläche:</p>
+      <p><span class="pfad">Neu → Ordner</span></p>
+      <p>Nennen Sie ihn <code>Malte</code>. Fertig ist <code>C:\Malte</code>.</p>
+      <p class="frei">Ein anderer Ort geht auch. Nur nicht der Ordner „Downloads“ — da wird irgendwann aufgeräumt, und dann ist die App weg.</p>
+    </div>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">3</span>
+    <div>
+      <h2>Die ZIP-Datei auspacken</h2>
+      <ol>
+        <li>Rechtsklick auf <code>MaltesLife-Windows.zip</code></li>
+        <li><span class="pfad">Alle extrahieren…</span></li>
+        <li>Bei „Ziel“ eintragen: <code>C:\Malte</code></li>
+        <li>Auf <b>Extrahieren</b> klicken</li>
+      </ol>
+      <p>Danach sieht es in <code>C:\Malte</code> so aus:</p>
+      <div class="ordner">📁 C:\Malte
+ ├ <b>MaltesLife.html</b>       <i>← die App</i>
+ ├ <b>Malte's Life starten.bat</b>  <i>← hier klicken</i>
+ ├ malteslife.ico        <i>← das Symbol</i>
+ └ SO GEHT DIE INSTALLATION.txt</div>
+      <div class="kasten warn">
+        <b>Wichtig</b>
+        <p>Diese Dateien müssen <b>zusammen in einem Ordner</b> bleiben. Einzeln funktionieren sie nicht.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">4</span>
+    <div>
+      <h2>Einmal ausprobieren</h2>
+      <p>Doppelklick auf <code>Malte's Life starten.bat</code></p>
+      <p>Kurz blitzt ein schwarzes Fenster auf — das gehört so. Dann öffnet sich die App in einem eigenen Fenster, ohne Adressleiste.</p>
+      <div class="kasten warn">
+        <b>Falls Windows warnt</b>
+        <p>„Der Computer wurde durch Windows geschützt“ erscheint, weil die Datei aus dem Internet kommt. Sie ist in Ordnung:</p>
+        <p><span class="pfad">Weitere Informationen → Trotzdem ausführen</span></p>
+        <p>Damit die Warnung nicht jedes Mal kommt: Rechtsklick auf die Datei → <b>Eigenschaften</b> → ganz unten Haken bei <b>Zulassen</b> → OK.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">5</span>
+    <div>
+      <h2>Symbol auf den Desktop legen</h2>
+      <p>Rechtsklick auf <code>Malte's Life starten.bat</code>:</p>
+      <p><span class="pfad">Senden an → Desktop (Verknüpfung erstellen)</span></p>
+      <p>Auf dem Desktop erscheint ein Symbol. Rechtsklick darauf → <b>Umbenennen</b> → <code>Malte's Life</code>.</p>
+      <p class="frei">Bei Windows 11 müssen Sie im Rechtsklick-Menü eventuell erst auf „Weitere Optionen anzeigen“ klicken.</p>
+    </div>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">6</span>
+    <div>
+      <h2>Ein schöneres Symbol geben <span class="frei">(freiwillig)</span></h2>
+      <ol>
+        <li>Rechtsklick auf das neue Desktop-Symbol → <b>Eigenschaften</b></li>
+        <li>Knopf <b>Anderes Symbol…</b> → <b>Durchsuchen…</b></li>
+        <li>Die Datei <code>malteslife.ico</code> aus <code>C:\Malte</code> auswählen</li>
+        <li>OK, dann nochmal OK</li>
+      </ol>
+      <p>Im selben Fenster können Sie bei <b>Ausführen</b> auf <b>Minimiert</b> stellen — dann blitzt das schwarze Fenster nicht mehr auf.</p>
+    </div>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">7</span>
+    <div>
+      <h2>Das Vorlesen prüfen</h2>
+      <p>Das konnten wir bisher nicht testen, weil auf Ihrem Arbeitszugang die Tonausgabe fehlt. Auf Maltes Laptop sollte es gehen:</p>
+      <ol>
+        <li>In der App unten auf <b>FÜR ELTERN</b></li>
+        <li>PIN eingeben</li>
+        <li>Ganz unten bei „Vorlesen auf diesem Gerät“ auf <b>Vorlesen testen</b></li>
+      </ol>
+      <p>Die App probiert dann sieben Einstellungen durch und sagt Ihnen im Klartext, welche funktioniert. Sie merkt sich das.</p>
+      <p class="frei">Hören Sie nichts, schicken Sie mir einfach den Text, der dort steht.</p>
+    </div>
+  </div>
+
+  <div class="schritt">
+    <span class="nr">8</span>
+    <div>
+      <h2>Eine Sicherung anlegen</h2>
+      <p>Im selben Eltern-Bereich, etwas weiter oben:</p>
+      <ol>
+        <li>Auf <b>Sicherung erzeugen</b> klicken — der Text wird automatisch markiert und kopiert</li>
+        <li>Word oder den Editor öffnen, mit <b>Strg + V</b> einfügen</li>
+        <li>Speichern in <code>C:\Malte</code>, zum Beispiel als <code>Sicherung</code></li>
+      </ol>
+      <p>Der Text ist lang — bis zu zwei Seiten. Das ist normal.</p>
+      <div class="kasten ok">
+        <b>Am besten einmal im Monat wiederholen</b>
+        <p>Damit ist der Fortschritt sicher, falls der Ordner verschoben wird, der Browser aufgeräumt wird oder der Laptop kaputtgeht.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="pin-karte">
+    <span class="pin-zahl">0902</span>
+    <div>
+      <p><b>Die Eltern-PIN.</b> Damit lösen Sie Gutscheine ein und öffnen den Eltern-Bereich. Bitte nicht im selben Ordner notieren, wo Malte sie findet.</p>
+    </div>
+  </div>
+
+  <hr class="trenn">
+
+  <h3>Wo liegt was?</h3>
+  <p>Die Kurzfassung zum Nachschlagen.</p>
+  <div class="tab-huelle">
+    <table>
+      <thead><tr><th>Was</th><th>Wohin</th></tr></thead>
+      <tbody>
+        <tr><td>Die ZIP-Datei</td><td>Egal, meist <b>Downloads</b>. Nach dem Auspacken können Sie sie löschen.</td></tr>
+        <tr><td>Die App</td><td><code>C:\Malte</code> — alle vier Dateien zusammen</td></tr>
+        <tr><td>Das Startsymbol</td><td>Auf dem <b>Desktop</b> (nur eine Verknüpfung, die eigentliche App bleibt in <code>C:\Malte</code>)</td></tr>
+        <tr><td>Die Sicherung</td><td>Als Textdatei ebenfalls in <code>C:\Malte</code></td></tr>
+        <tr><td>Der Fortschritt</td><td>Speichert die App selbst auf dem Laptop. Sie müssen nichts tun.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Wenn etwas nicht klappt</h3>
+  <div class="tab-huelle">
+    <table>
+      <tbody>
+        <tr><td>Nichts passiert beim Doppelklick</td><td>Liegen alle Dateien im selben Ordner? Die <code>.bat</code> sagt Ihnen sonst, was fehlt.</td></tr>
+        <tr><td>Die App öffnet sich im normalen Browser-Fenster</td><td>Funktioniert trotzdem. Es heißt nur, dass Edge und Chrome nicht am üblichen Ort liegen.</td></tr>
+        <tr><td>Der Fortschritt scheint weg</td><td>Wurde der Ordner verschoben? Zurückschieben hilft. Sonst die Sicherung einlesen.</td></tr>
+        <tr><td>Vorlesen bleibt stumm</td><td>Der Testknopf im Eltern-Bereich sagt den Grund. Schicken Sie mir den Text.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="fuss">Alle vier Dateien bleiben zusammen in <code>C:\Malte</code> — das ist die einzige Regel. Alles Weitere darf schiefgehen, ohne dass etwas verloren geht.</p>
+</div>
