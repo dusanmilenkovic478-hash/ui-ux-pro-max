@@ -291,6 +291,19 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 .hoer:hover{background:var(--rand)}
 .hoer:active{transform:translate(2px,3px);box-shadow:0 0 0 #0A0714}
 .hoer.laeuft{background:var(--akzent);color:#120C22;animation:puls 1s ease-in-out infinite}
+.hoer.kaputt{opacity:.45}
+.hoer-meldung{
+  margin:9px 0 0;padding:9px 12px;border-radius:10px;text-align:center;
+  background:color-mix(in srgb,var(--falsch) 16%,transparent);
+  border:2px solid color-mix(in srgb,var(--falsch) 40%,transparent);
+  color:var(--tinte);font-size:.84rem;line-height:1.45;
+}
+.diagnose{
+  margin-top:10px;padding:11px 13px;border-radius:11px;
+  background:#120D24;border:2px solid var(--rand);
+  font-size:.82rem;line-height:1.5;color:var(--gedaempft);
+}
+.diagnose b{color:var(--tinte);font-family:var(--f-disp);display:block;margin-bottom:3px;font-size:.86rem}
 
 /* ===== LESEHILFE (LRS): größer, luftiger, mehr Buchstabenabstand ===== */
 html[data-lesehilfe="an"] body{font-size:17.5px}
@@ -405,6 +418,8 @@ html[data-lesehilfe="an"] .witz p{letter-spacing:.035em;line-height:1.7}
       <p class="aufgabe-text" id="aufgabe-text">…</p>
       <div class="bild-box" id="bild-box" hidden></div>
     </div>
+
+    <p class="hoer-meldung" id="hoer-meldung" hidden></p>
 
     <div class="antworten" id="antworten"></div>
 
@@ -527,6 +542,14 @@ html[data-lesehilfe="an"] .witz p{letter-spacing:.035em;line-height:1.7}
           </table>
         </div>
         <p class="leise" style="margin-top:14px" id="eltern-rat"></p>
+
+        <div class="diagnose">
+          <b>Vorlesen auf diesem Gerät</b>
+          <span id="diagnose-text">—</span>
+          <div class="knopf-reihe" style="margin-top:9px">
+            <button class="mini" id="btn-sprach-test">Vorlesen testen</button>
+          </div>
+        </div>
         <div class="knopf-reihe">
           <button class="mini" id="btn-reset">Fortschritt zurücksetzen</button>
         </div>

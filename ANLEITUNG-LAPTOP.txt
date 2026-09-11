@@ -1,0 +1,51 @@
+MALTE'S LIFE — auf dem Laptop benutzen
+======================================
+
+Sie haben die Datei  malteslife.html  bekommen.
+Das ist die komplette App in einer einzigen Datei.
+
+SO GEHT ES
+-----------
+1. Datei auf dem Laptop speichern, am besten auf dem Desktop.
+2. Doppelklick darauf. Die App öffnet sich im Browser.
+3. Fertig. Es wird kein Internet gebraucht.
+
+Tipp: Die Datei per Rechtsklick an "Start" oder an die Taskleiste
+anheften, dann ist sie wie eine normale App erreichbar.
+
+
+VORLESEN PRÜFEN
+---------------
+Genau dafür ist diese Datei gedacht. So testen Sie es:
+
+1. App öffnen
+2. Unten auf "FÜR ELTERN" klicken
+3. PIN eingeben
+4. Ganz unten steht "Vorlesen auf diesem Gerät"
+   Dort sehen Sie, wie viele Stimmen gefunden wurden.
+5. Auf "Vorlesen testen" klicken.
+
+Sie hören etwas    -> alles gut, es lag am Browser-Fenster
+                      auf der Webseite, nicht an der App.
+Sie hören nichts   -> lesen Sie, was unter "Vorlesen auf diesem
+                      Gerät" steht, und schicken Sie mir den Text.
+
+Wenn dort "0 Stimmen" steht, fehlt Windows die Sprachausgabe:
+   Einstellungen  ->  Zeit und Sprache  ->  Sprache und Region
+   ->  bei Deutsch auf die drei Punkte  ->  Sprachoptionen
+   ->  Sprache (Text-zu-Sprache) hinzufügen
+
+
+WAS NOCH ZU WISSEN IST
+----------------------
+- Der Fortschritt wird im Browser gespeichert. Solange die Datei
+  vom selben Ort mit demselben Browser geöffnet wird, bleibt alles
+  erhalten.
+- Die Schriftarten kommen ohne Internet aus einer Ersatzschrift.
+  Sieht minimal anders aus, funktioniert aber gleich.
+- Eigene Hintergrundbilder: einen Ordner "bilder" neben die Datei
+  legen. Die Bilder müssen dann in der App eingetragen werden —
+  dafür brauchen Sie die Version mit den Einzeldateien aus dem
+  Ordner app/.
+- PIN ändern: Das geht in dieser Einzeldatei nur umständlich.
+  Sagen Sie mir Ihre Wunsch-PIN, dann baue ich sie ein.

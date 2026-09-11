@@ -156,31 +156,99 @@ function sprechText(t) {
 }
 
 let deutscheStimme = null;
+let sprachProblem = null;      // zuletzt aufgetretener Grund, für die Diagnose
+
+function stimmenListe() {
+  try { return window.speechSynthesis ? (speechSynthesis.getVoices() || []) : []; }
+  catch (e) { return []; }
+}
 function holeStimme() {
-  if (deutscheStimme || !window.speechSynthesis) return deutscheStimme;
-  const alle = speechSynthesis.getVoices() || [];
+  const alle = stimmenListe();
+  if (!alle.length) return null;
   deutscheStimme = alle.find(v => /^de/i.test(v.lang)) || null;
   return deutscheStimme;
 }
-if (window.speechSynthesis) speechSynthesis.onvoiceschanged = () => { deutscheStimme = null; holeStimme(); };
+if (window.speechSynthesis && "onvoiceschanged" in speechSynthesis)
+  speechSynthesis.onvoiceschanged = holeStimme;
+
+const PROBLEM_TEXT = {
+  "fehlt":       "Dieser Browser kann nicht vorlesen.",
+  "blockiert":   "Vorlesen ist hier blockiert. Auf dem Laptop als eigene Datei geht es.",
+  "not-allowed": "Vorlesen ist hier blockiert. Auf dem Laptop als eigene Datei geht es.",
+  "keine-stimme":"Auf diesem Gerät ist keine Sprachstimme installiert.",
+  "kein-start":  "Vorlesen hat nicht gestartet. Auf dem Laptop als eigene Datei geht es."
+};
+
+function zeigeSprachProblem(grund) {
+  sprachProblem = grund;
+  const feld = $("hoer-meldung");
+  if (!feld) return;
+  feld.textContent = PROBLEM_TEXT[grund] || PROBLEM_TEXT["kein-start"];
+  feld.hidden = false;
+  const knopf = $("btn-hoeren");
+  if (knopf) { knopf.classList.remove("laeuft"); knopf.classList.add("kaputt"); }
+}
 
 function vorlesen(text) {
   const knopf = $("btn-hoeren");
-  if (!window.speechSynthesis) {
-    if (knopf) knopf.title = "Vorlesen geht auf diesem Gerät leider nicht";
+  const feld = $("hoer-meldung");
+  if (feld) feld.hidden = true;
+
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined")
+    return zeigeSprachProblem("fehlt");
+
+  // Läuft gerade etwas? Dann ist der Knopf ein Stopp-Knopf.
+  if (knopf && knopf.classList.contains("laeuft")) {
+    try { speechSynthesis.cancel(); } catch (e) {}
+    knopf.classList.remove("laeuft");
     return;
   }
-  if (speechSynthesis.speaking) { speechSynthesis.cancel(); if (knopf) knopf.classList.remove("laeuft"); return; }
-  const rede = new SpeechSynthesisUtterance(sprechText(text));
+
+  let rede;
+  try {
+    speechSynthesis.cancel();
+    rede = new SpeechSynthesisUtterance(sprechText(text));
+  } catch (e) { return zeigeSprachProblem("blockiert"); }
+
   rede.lang = "de-DE";
-  rede.rate = 0.88;          // etwas langsamer — hilft beim Mitlesen
-  const stimme = holeStimme();
-  if (stimme) rede.voice = stimme;
-  if (knopf) {
-    knopf.classList.add("laeuft");
-    rede.onend = rede.onerror = () => knopf.classList.remove("laeuft");
-  }
-  speechSynthesis.speak(rede);
+  rede.rate = 0.88;                       // etwas langsamer — hilft beim Mitlesen
+  const stimme = deutscheStimme || holeStimme();
+  if (stimme) rede.voice = stimme;        // ohne Stimme nimmt der Browser selbst eine passende
+
+  let startete = false;
+  rede.onstart = () => { startete = true; if (knopf) knopf.classList.add("laeuft"); };
+  rede.onend   = () => { if (knopf) knopf.classList.remove("laeuft"); };
+  rede.onerror = (e) => {
+    const grund = (e && e.error) || "kein-start";
+    if (grund === "interrupted" || grund === "canceled") { if (knopf) knopf.classList.remove("laeuft"); return; }
+    zeigeSprachProblem(grund);
+  };
+
+  try {
+    speechSynthesis.speak(rede);
+    // Chrome lässt die Warteschlange nach cancel() gelegentlich pausiert stehen
+    if (speechSynthesis.paused) speechSynthesis.resume();
+  } catch (e) { return zeigeSprachProblem("blockiert"); }
+
+  // Still gescheitert? Nach kurzer Zeit nachsehen und es dem Kind sagen,
+  // statt den Knopf einfach nicht reagieren zu lassen.
+  setTimeout(() => {
+    if (startete || speechSynthesis.speaking || speechSynthesis.pending) return;
+    zeigeSprachProblem(stimmenListe().length ? "kein-start" : "keine-stimme");
+  }, 800);
+}
+
+/* Was kann dieses Gerät? Wird im Eltern-Bereich angezeigt. */
+function sprachDiagnose() {
+  if (!window.speechSynthesis) return "Dieser Browser kennt keine Sprachausgabe.";
+  const alle = stimmenListe();
+  const deutsch = alle.filter(v => /^de/i.test(v.lang));
+  let t = `${alle.length} Stimme(n) gefunden, davon ${deutsch.length} deutsche`;
+  if (deutsch.length) t += ` (${deutsch.slice(0, 3).map(v => v.name).join(", ")})`;
+  t += ".";
+  if (!alle.length) t += " Ohne installierte Stimme kann nicht vorgelesen werden.";
+  if (sprachProblem) t += ` Zuletzt gemeldet: ${sprachProblem}.`;
+  return t;
 }
 
 /* Lesehilfe: größere Schrift, mehr Abstand zwischen Buchstaben */
@@ -337,6 +405,7 @@ function naechsteAufgabe() {
 
   $("btn-hoeren").hidden = !CONFIG.vorlesen;
   $("btn-hoeren").classList.remove("laeuft");
+  $("hoer-meldung").hidden = true;
   if (window.speechSynthesis) speechSynthesis.cancel();
 
   $("blase").hidden = true;
@@ -707,6 +776,8 @@ function zeichneEltern(entsperrt) {
     koerper.appendChild(tr);
   });
 
+  $("diagnose-text").textContent = sprachDiagnose();
+
   const schwach = zeilen.filter(zl => zl.v >= 10 && zl.r / zl.v < 0.6);
   $("eltern-rat").textContent = gesamtV < 10
     ? "Sobald ein paar Levels gespielt wurden, sehen Sie hier, welche Themen Mühe machen."
@@ -792,6 +863,11 @@ function verdrahten() {
   $("btn-test-nochmal").addEventListener("click", starteTest);
   $("btn-test-heim").addEventListener("click", heim);
   $("btn-lesehilfe").addEventListener("click", () => setzeLesehilfe(document.documentElement.dataset.lesehilfe !== "an"));
+
+  $("btn-sprach-test").addEventListener("click", () => {
+    vorlesen("Test. Drei plus vier ist sieben.");
+    setTimeout(() => { $("diagnose-text").textContent = sprachDiagnose(); }, 1100);
+  });
 
   $("btn-album").addEventListener("click", zeichneAlbum);
   $("btn-album-zurueck").addEventListener("click", heim);
