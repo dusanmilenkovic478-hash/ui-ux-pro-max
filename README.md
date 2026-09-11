@@ -12,6 +12,14 @@ etwa bei Klasse 4/5 liegt und die bis zum Schulabschluss aufholen soll.
   festen Fragenliste — die Aufgaben gehen nie aus und sind nie auswendig gelernt.
 - **Ausgleich statt Frust.** Nach 2 Fehlern in Folge wird die nächste Aufgabe
   leichter, nach 3 Treffern wieder schwerer. Kein Timer, keine Leben, keine Strafe.
+- **Falsches kommt zurück.** Eine falsch beantwortete Aufgabe taucht 3 und 8
+  Aufgaben später erneut auf, sichtbar als "Nochmal" markiert.
+- **Sammelalbum.** Jedes geschaffte Level bringt ein Crew-Mitglied — 30 insgesamt.
+- **Streak-Joker.** Ein ausgelassener Tag pro Woche kostet die Serie nicht.
+- **Anschauungsbilder.** Bruchkreise und Punktefelder, teils direkt bei der
+  Aufgabe, teils erst als Hilfe nach einem Fehler.
+- **Eltern-Bereich hinter der PIN** mit Trefferquote je Kapitel und einem
+  Hinweis, wo Nachhilfe ansetzen sollte.
 - **Gutschein-System.** Jedes bestandene Level gibt einen Gutschein mit Code.
   Mama tippt die PIN ein, der Gutschein wird als eingelöst gestempelt.
 - **Tagesziel 2 %.** 20 richtige Antworten am Tag = 2 %. 1000 richtige = 100 %.
@@ -34,7 +42,7 @@ Deshalb:
 
 | Datei | Wofür |
 |---|---|
-| `app/config.js` | **Hier ändern Sie alles:** Name, PIN, Belohnungen, Sprüche, Tagesziel |
+| `app/config.js` | **Hier ändern Sie alles:** Name, PIN, Belohnungen, Crew, Sprüche, Tagesziel |
 | `app/bilder/` | Eigene Hintergrundbilder ablegen (Anleitung liegt im Ordner) |
 | `app/aufgaben.js` | Die Aufgaben-Generatoren |
 | `app/app.js` | Spiellogik |

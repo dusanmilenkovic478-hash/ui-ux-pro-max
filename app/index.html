@@ -192,7 +192,7 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 .blase b{font-family:var(--f-disp);font-weight:800;font-size:1.05rem;display:block;margin-bottom:3px}
 .blase.gut b{color:var(--richtig)}
 .blase.schlecht b{color:var(--falsch)}
-.blase p{margin:0;font-size:.93rem;color:var(--gedaempft);line-height:1.5}
+.blase p{margin:0;font-size:.93rem;color:var(--gedaempft);line-height:1.5;white-space:pre-line}
 
 /* ===== GUTSCHEIN ===== */
 .gutschein{
@@ -240,6 +240,46 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 .trenner{height:3px;background:var(--rand);border-radius:99px;margin:var(--sp) 0;opacity:.55}
 .fuss{margin-top:22px;text-align:center;font-size:.76rem;color:var(--gedaempft);line-height:1.6}
 [hidden]{display:none!important}
+
+
+/* ===== ANSCHAUUNGSBILDER ===== */
+.bild-box{display:flex;justify-content:center;margin-top:14px;position:relative;z-index:2}
+.bild-box svg{max-width:100%;height:auto;display:block}
+.blase .bild-box{margin-top:10px}
+.blase .bild-box b{font-family:var(--f-disp);font-size:.9rem;color:var(--tinte)}
+
+/* "Nochmal"-Markierung bei Wiederholungsaufgaben */
+.nochmal{
+  position:absolute;top:10px;left:12px;z-index:3;
+  font-family:var(--f-disp);font-weight:800;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;
+  background:var(--k3);color:#1A1400;padding:4px 9px;border-radius:7px;border:2px solid #0A0714;
+}
+
+/* ===== SAMMELALBUM ===== */
+.album{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:var(--sp)}
+@media (max-width:360px){.album{grid-template-columns:repeat(4,1fr)}}
+.karte{
+  aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:#120D24;border:3px solid #0A0714;padding:3px;text-align:center;
+}
+.karte.habe{background:linear-gradient(165deg,var(--kf),color-mix(in srgb,var(--kf) 40%,#120D24));box-shadow:2px 3px 0 #0A0714}
+.karte .fig{font-size:clamp(1.1rem,5vw,1.6rem);line-height:1}
+.karte .nam{font-family:var(--f-disp);font-weight:800;font-size:.58rem;color:#120C22;letter-spacing:.02em;line-height:1;word-break:break-word}
+.karte.leer .fig{opacity:.22;filter:grayscale(1)}
+.karte.leer .nam{color:var(--gedaempft);opacity:.5}
+
+/* ===== ELTERN-BEREICH ===== */
+.tab{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:10px}
+.tab th{font-family:var(--f-disp);font-weight:600;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gedaempft);text-align:left;padding:6px 8px;border-bottom:2px solid var(--rand)}
+.tab td{padding:9px 8px;border-bottom:1px solid var(--rand)}
+.tab td:last-child,.tab th:last-child{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--f-disp);font-weight:800}
+.quote{display:inline-block;min-width:52px;padding:3px 8px;border-radius:7px;font-size:.82rem}
+.quote.gut{background:color-mix(in srgb,var(--richtig) 26%,transparent);color:var(--richtig)}
+.quote.mittel{background:color-mix(in srgb,#FFD84D 24%,transparent);color:#FFD84D}
+.quote.schwach{background:color-mix(in srgb,var(--falsch) 24%,transparent);color:var(--falsch)}
+.quote.keine{color:var(--gedaempft)}
+.tab-wrap{overflow-x:auto}
+.knopf-reihe{display:flex;gap:9px;margin-top:var(--sp);flex-wrap:wrap;justify-content:center}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -300,8 +340,9 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
     <p class="eyebrow" style="margin-top:26px">Die 6 Kapitel</p>
     <div class="kapitel-liste" id="kapitel-liste"></div>
 
-    <div class="stapel" style="margin-top:20px">
-      <button class="mini" id="btn-reset" style="align-self:center">Fortschritt zurücksetzen</button>
+    <div class="knopf-reihe">
+      <button class="mini" id="btn-album">🃏 Album <span id="album-zahl"></span></button>
+      <button class="mini" id="btn-eltern">Für Eltern</button>
     </div>
     <p class="fuss" id="fuss-text"></p>
   </section>
@@ -316,7 +357,9 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 
     <div class="aufgabe" id="aufgabe-box">
       <div class="speed"></div>
+      <span class="nochmal" id="nochmal-label" hidden>Nochmal</span>
       <p class="aufgabe-text" id="aufgabe-text">…</p>
+      <div class="bild-box" id="bild-box" hidden></div>
     </div>
 
     <div class="antworten" id="antworten"></div>
@@ -324,6 +367,7 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
     <div class="blase" id="blase" hidden>
       <b id="blase-titel"></b>
       <p id="blase-text"></p>
+      <div class="bild-box" id="blase-bild" hidden></div>
     </div>
 
     <div class="stapel" id="quiz-weiter" hidden>
@@ -368,6 +412,54 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
       <div class="stapel">
         <button class="knopf" id="btn-ende-weiter">NÄCHSTES KAPITEL ▶</button>
         <button class="knopf zweit" id="btn-ende-heim">Zur Übersicht</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SAMMELALBUM ============ -->
+  <section id="s-album" hidden>
+    <div class="panel">
+      <p class="eyebrow">Sammlung</p>
+      <h2>Deine Crew</h2>
+      <p class="leise" style="margin:8px 0 0" id="album-text"></p>
+      <div class="album" id="album-gitter"></div>
+      <div class="stapel">
+        <button class="knopf zweit" id="btn-album-zurueck">Zurück</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ELTERN-BEREICH ============ -->
+  <section id="s-eltern" hidden>
+    <div class="panel">
+      <p class="eyebrow">Nur für Eltern</p>
+      <h2 id="eltern-titel">PIN eingeben</h2>
+
+      <div id="eltern-sperre">
+        <p class="leise" style="margin:8px 0 0">Hier sehen Sie, welche Aufgabentypen sitzen und wo es noch hakt.</p>
+        <div class="pin-feld">
+          <input id="eltern-pin" type="password" inputmode="numeric" maxlength="4" placeholder="PIN" autocomplete="off">
+          <button class="mini" id="btn-eltern-pin">Öffnen</button>
+        </div>
+        <p class="leise" id="eltern-meldung" style="margin:8px 0 0;min-height:1.3em"></p>
+      </div>
+
+      <div id="eltern-inhalt" hidden>
+        <p class="leise" style="margin:8px 0 14px" id="eltern-zusammenfassung"></p>
+        <div class="tab-wrap">
+          <table class="tab">
+            <thead><tr><th>Kapitel</th><th>Aufgaben</th><th>Richtig</th></tr></thead>
+            <tbody id="eltern-tabelle"></tbody>
+          </table>
+        </div>
+        <p class="leise" style="margin-top:14px" id="eltern-rat"></p>
+        <div class="knopf-reihe">
+          <button class="mini" id="btn-reset">Fortschritt zurücksetzen</button>
+        </div>
+      </div>
+
+      <div class="stapel">
+        <button class="knopf zweit" id="btn-eltern-zurueck">Zurück</button>
       </div>
     </div>
   </section>

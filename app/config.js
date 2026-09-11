@@ -70,5 +70,23 @@ const CONFIG = {
 
   /* --- 8. LOB WÄHREND DES SPIELS -------------------------- */
   lobRichtig: ["Nice!", "Sitzt!", "Genau das!", "Läuft bei dir.", "Richtig!", "Yes!", "Volltreffer.", "Easy.", "Stark.", "Weiter so!"],
-  lobFalsch:  ["Fast.", "Knapp daneben.", "Kein Ding.", "Nochmal.", "Passiert.", "Nicht schlimm."]
+  lobFalsch:  ["Fast.", "Knapp daneben.", "Kein Ding.", "Nochmal.", "Passiert.", "Nicht schlimm."],
+
+  /* --- 9. SAMMEL-CREW -------------------------------------
+     Für jedes der 30 Level gibt es ein neues Crew-Mitglied
+     fürs Album. Reihenfolge = Kapitel 1 Level 1, 1-2, 1-3 …
+     Emoji und Namen frei änderbar.                         */
+  crew: [
+    ["👻","Yurei"],    ["🛸","Kosmo"],   ["🐙","Tako"],     ["🍡","Dango"],    ["⚡","Zappa"],
+    ["🦊","Kitsu"],    ["🌀","Wirbel"],  ["🐉","Ryu"],      ["🍜","Ramen-Ro"], ["🔮","Orakel"],
+    ["🐈‍⬛","Kuro"],     ["🌙","Tsuki"],   ["🗿","Moai"],     ["🍥","Naru"],     ["✨","Kira"],
+    ["🦑","Ika"],      ["🎐","Furin"],   ["🐸","Kero"],     ["🍄","Pilzo"],    ["🌸","Sakura"],
+    ["🤖","Robo-Ken"], ["🪐","Planeta"], ["🐺","Okami"],    ["🔥","Hono"],     ["❄️","Yuki"],
+    ["🦋","Chou"],     ["🌊","Nami"],    ["🥷","Shinobi"],  ["👑","Kaiser"],   ["🏆","Legende"]
+  ],
+
+  /* --- 10. STREAK-JOKER ------------------------------------
+     So viele Tage darf pro Woche ausfallen, ohne dass die
+     Serie reißt. 0 = kein Joker.                           */
+  jokerProWoche: 1
 };
