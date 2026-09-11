@@ -1373,17 +1373,24 @@ function zeigeSprachProblem(grund) {
   if (knopf) { knopf.classList.remove("laeuft"); knopf.classList.add("kaputt"); }
 }
 
-function vorlesen(text) {
+/* Chrome verwirft das Sprach-Objekt, sobald keine Referenz mehr darauf
+   zeigt — dann passiert einfach nichts, ohne Fehlermeldung. Deshalb
+   halten wir es hier fest, bis es fertig gesprochen ist. */
+let laufendeRede = null;
+let sprachVersuch = 0;
+
+function vorlesen(text, ohneStimme) {
   const knopf = $("btn-hoeren");
   const feld = $("hoer-meldung");
-  if (feld) feld.hidden = true;
+  if (feld && !ohneStimme) feld.hidden = true;
 
   if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined")
     return zeigeSprachProblem("fehlt");
 
   // Läuft gerade etwas? Dann ist der Knopf ein Stopp-Knopf.
-  if (knopf && knopf.classList.contains("laeuft")) {
+  if (!ohneStimme && knopf && knopf.classList.contains("laeuft")) {
     try { speechSynthesis.cancel(); } catch (e) {}
+    laufendeRede = null;
     knopf.classList.remove("laeuft");
     return;
   }
@@ -1395,31 +1402,41 @@ function vorlesen(text) {
   } catch (e) { return zeigeSprachProblem("blockiert"); }
 
   rede.lang = "de-DE";
-  rede.rate = 0.88;                       // etwas langsamer — hilft beim Mitlesen
-  const stimme = deutscheStimme || holeStimme();
-  if (stimme) rede.voice = stimme;        // ohne Stimme nimmt der Browser selbst eine passende
+  rede.rate = 0.88;                   // etwas langsamer — hilft beim Mitlesen
+  // Beim zweiten Anlauf ohne feste Stimme: manche Browser sprechen nur
+  // mit ihrer eigenen Vorauswahl.
+  if (!ohneStimme) {
+    const stimme = deutscheStimme || holeStimme();
+    if (stimme) rede.voice = stimme;
+  }
 
+  laufendeRede = rede;                // <- verhindert das stille Verschlucken
+  const meinVersuch = ++sprachVersuch;
   let startete = false;
+
   rede.onstart = () => { startete = true; if (knopf) knopf.classList.add("laeuft"); };
-  rede.onend   = () => { if (knopf) knopf.classList.remove("laeuft"); };
+  rede.onend   = () => { laufendeRede = null; if (knopf) knopf.classList.remove("laeuft"); };
   rede.onerror = (e) => {
     const grund = (e && e.error) || "kein-start";
+    laufendeRede = null;
     if (grund === "interrupted" || grund === "canceled") { if (knopf) knopf.classList.remove("laeuft"); return; }
+    if (!ohneStimme) return vorlesen(text, true);      // zweiter Anlauf
     zeigeSprachProblem(grund);
   };
 
   try {
     speechSynthesis.speak(rede);
-    // Chrome lässt die Warteschlange nach cancel() gelegentlich pausiert stehen
     if (speechSynthesis.paused) speechSynthesis.resume();
   } catch (e) { return zeigeSprachProblem("blockiert"); }
 
-  // Still gescheitert? Nach kurzer Zeit nachsehen und es dem Kind sagen,
-  // statt den Knopf einfach nicht reagieren zu lassen.
+  // Nichts passiert? Erst den zweiten Anlauf, dann erst aufgeben.
+  // 1,6 s, weil die Sprachausgabe beim allerersten Mal länger braucht.
   setTimeout(() => {
+    if (meinVersuch !== sprachVersuch) return;           // längst ein neuer Versuch
     if (startete || speechSynthesis.speaking || speechSynthesis.pending) return;
+    if (!ohneStimme) return vorlesen(text, true);
     zeigeSprachProblem(stimmenListe().length ? "kein-start" : "keine-stimme");
-  }, 800);
+  }, 1600);
 }
 
 /* Was kann dieses Gerät? Wird im Eltern-Bereich angezeigt. */
@@ -1432,6 +1449,8 @@ function sprachDiagnose() {
   t += ".";
   if (!alle.length) t += " Ohne installierte Stimme kann nicht vorgelesen werden.";
   if (sprachProblem) t += ` Zuletzt gemeldet: ${sprachProblem}.`;
+  if (window.speechSynthesis)
+    t += ` Status: spricht=${speechSynthesis.speaking}, wartet=${speechSynthesis.pending}, pausiert=${speechSynthesis.paused}.`;
   return t;
 }
 
