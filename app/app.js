@@ -392,7 +392,7 @@ function zeichneStart() {
 
   const fertigeLevel = stand.kapitel.reduce((s, k) => s + k.levelFertig, 0);
   $("btn-weiter").textContent = (fertigeLevel === 0 && stand.richtigGesamt === 0) ? "▶ LOS GEHT'S" : "▶ WEITERMACHEN";
-  $("album-zahl").textContent = `${stand.crewHabe.length}/30`;
+  $("album-zahl").textContent = `${stand.crewHabe.length}/${KAPITEL.length * 5}`;
 
   const offen = Object.values(stand.gutscheine).filter(g => !g.eingeloest).length;
   $("fuss-text").textContent = offen
@@ -403,7 +403,16 @@ function zeichneStart() {
 
   const liste = $("kapitel-liste");
   liste.innerHTML = "";
+  let letzteGruppe = -1;
   KAPITEL.forEach((k, i) => {
+    if (k.gruppe !== letzteGruppe) {
+      letzteGruppe = k.gruppe;
+      const g = GRUPPEN[k.gruppe];
+      const titel = document.createElement("p");
+      titel.className = "gruppe-titel";
+      titel.innerHTML = `${g.name} <small>${g.unter}</small>`;
+      liste.appendChild(titel);
+    }
     const fertig = stand.kapitel[i].levelFertig;
     const b = document.createElement("button");
     b.className = "kap";
@@ -808,19 +817,31 @@ function testPinPruefen() {
 function zeichneAlbum() {
   setzeAkzent(null);
   const habe = stand.crewHabe.length;
+  const alle = KAPITEL.length * 5;
   $("album-text").textContent = habe === 0
     ? "Noch leer. Für jedes geschaffte Level kommt ein Mitglied dazu."
-    : habe >= 30 ? "Komplett. Alle 30 beisammen. Wahnsinn." : `${habe} von 30 gesammelt. Noch ${30 - habe} zu holen.`;
+    : habe >= alle ? `Komplett. Alle ${alle} beisammen. Wahnsinn.`
+    : `${habe} von ${alle} gesammelt. Noch ${alle - habe} zu holen.`;
 
   const gitter = $("album-gitter");
   gitter.innerHTML = "";
-  CONFIG.crew.forEach((figur, i) => {
+  let letzteGruppe = -1;
+  CONFIG.crew.slice(0, alle).forEach((figur, i) => {
+    const kapitelNr = Math.floor(i / 5);
+    const kap = KAPITEL[kapitelNr];
+    if (kap.gruppe !== letzteGruppe) {
+      letzteGruppe = kap.gruppe;
+      const titel = document.createElement("p");
+      titel.className = "gruppe-titel";
+      titel.innerHTML = `${GRUPPEN[kap.gruppe].name} <small>${GRUPPEN[kap.gruppe].unter}</small>`;
+      gitter.appendChild(titel);
+    }
     const habeIch = stand.crewHabe.includes(i);
     const d = document.createElement("div");
     d.className = "karte " + (habeIch ? "habe" : "leer");
-    d.style.setProperty("--kf", farbeVon(FARBVAR[KAPITEL[Math.floor(i / 5)].farbe]));
+    d.style.setProperty("--kf", farbeVon(FARBVAR[kap.farbe]));
     d.innerHTML = `<span class="fig">${habeIch ? figur[0] : "❔"}</span><span class="nam">${habeIch ? figur[1] : "???"}</span>`;
-    d.title = habeIch ? figur[1] : `Kapitel ${Math.floor(i / 5) + 1}, Level ${(i % 5) + 1}`;
+    d.title = habeIch ? figur[1] : `${kap.name}, Level ${(i % 5) + 1}`;
     gitter.appendChild(d);
   });
   zeigeScreen("s-album");
@@ -849,7 +870,7 @@ function zeichneEltern(entsperrt) {
   $("eltern-zusammenfassung").textContent = gesamtV === 0
     ? "Noch keine Aufgaben bearbeitet."
     : `${gesamtV} Aufgaben bearbeitet, davon ${gesamtR} richtig (${Math.round(gesamtR / gesamtV * 100)} %). `
-      + `${stand.crewHabe.length} von 30 Levels geschafft, Serie: ${stand.streak} Tag(e).`;
+      + `${stand.crewHabe.length} von ${KAPITEL.length * 5} Levels geschafft, Serie: ${stand.streak} Tag(e).`;
 
   const koerper = $("eltern-tabelle");
   koerper.innerHTML = "";

@@ -108,6 +108,14 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 
 /* ===== KAPITEL-LANDKARTE (der Regenbogen) ===== */
 .kapitel-liste{display:flex;flex-direction:column;gap:10px;margin-top:var(--sp)}
+.gruppe-titel{
+  font-family:var(--f-disp);font-weight:800;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--akzent);display:flex;align-items:center;gap:9px;margin:18px 0 2px;
+}
+.gruppe-titel:first-child{margin-top:22px}
+.gruppe-titel small{font-family:var(--f-body);font-weight:500;font-size:.72rem;letter-spacing:.04em;text-transform:none;color:var(--gedaempft)}
+.gruppe-titel::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,currentColor,transparent);opacity:.4}
+.album .gruppe-titel{grid-column:1/-1;margin:14px 0 0}
 .kap{
   display:grid;grid-template-columns:46px 1fr auto;gap:13px;align-items:center;
   width:100%;text-align:left;padding:12px 14px;border-radius:14px;
@@ -392,7 +400,6 @@ html[data-lesehilfe="an"] .witz p{letter-spacing:.035em;line-height:1.7}
       <span class="tk-pfeil" id="tk-pfeil"></span>
     </button>
 
-    <p class="eyebrow" style="margin-top:26px">Die 6 Kapitel</p>
     <div class="kapitel-liste" id="kapitel-liste"></div>
 
     <div class="knopf-reihe">

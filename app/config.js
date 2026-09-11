@@ -55,7 +55,12 @@ const CONFIG = {
     3: ["Ein Getränk deiner Wahl", "5 € Taschengeld", "Pizza-Abend", "Ein Anime-Marathon-Nachmittag", "10 € für den Manga-Laden"],
     4: ["Ein Snack deiner Wahl", "6 € Taschengeld", "Einmal Abwasch erlassen", "Freundin darf übernachten", "Ein Manga-Poster für dein Zimmer"],
     5: ["Lieblings-Frühstück", "8 € Taschengeld", "Ein Bubble-Tea", "Ein Nachmittag ohne Hausaufgaben-Diskussion", "Der nächste Band deiner Lieblingsreihe"],
-    6: ["10 € Taschengeld", "Ein Kino-Besuch", "15 € Taschengeld", "Eine Anime-Figur für dein Regal", "20 € — und du hast ALLES geschafft"]
+    6: ["10 € Taschengeld", "Ein Kino-Besuch", "15 € Taschengeld", "Eine Anime-Figur für dein Regal", "20 € — Grundlagen komplett!"],
+    7: ["Ein Bubble-Tea", "8 € Taschengeld", "Sushi-Abend", "Du bestimmst das Wochenend-Programm", "Ein Manga-Band deiner Wahl"],
+    8: ["Ein Snack deiner Wahl", "10 € Taschengeld", "Ein Kino-Abend", "Ein Freibad- oder Schwimmbad-Tag", "15 € für den Manga-Laden"],
+    9: ["Lieblings-Frühstück", "12 € Taschengeld", "Essen gehen, du suchst aus", "Ein Nachmittag komplett frei", "20 € Taschengeld"],
+    10: ["Ein Getränk deiner Wahl", "15 € Taschengeld", "Ein Anime-Kino-Besuch", "Eine Anime-Figur", "25 € Taschengeld"],
+    11: ["Ein Snack deiner Wahl", "20 € Taschengeld", "Ein Shopping-Nachmittag", "Ein kompletter Manga-Sammelband", "50 € — du hast Klasse 4 bis 9 geschafft!"]
   },
 
   /* --- 7. SPRÜCHE AM KAPITEL-ENDE ------------------------- */
@@ -65,7 +70,12 @@ const CONFIG = {
     "Lehrer: „Wofür brauchst du Mathe im echten Leben?\"\n\nIch, beim Aufteilen der Pizzarechnung unter 5 Leuten: 👁️👄👁️",
     "Parallele Linien haben so viel gemeinsam.\n\nSchade, dass sie sich nie treffen werden.",
     "Statistisch gesehen sind 6 von 5 Menschen schlecht in Brüchen.",
-    "Du hast 6 Kapitel Mathe durchgezogen.\n\nDein Taschenrechner ist offiziell arbeitslos. 🏆"
+    "Du hast 6 Kapitel Mathe durchgezogen.\n\nDein Taschenrechner ist offiziell arbeitslos. 🏆",
+    "Minus-Zahlen sind wie dein Kontostand am Monatsende:\n\nErst verwirrend, dann Alltag.",
+    "Dreisatz ist die einzige Mathe,\n\ndie du beim Online-Shopping wirklich brauchst. Und zwar ständig.",
+    "Du kannst jetzt ausrechnen, ob der Rabatt echt ein Rabatt ist.\n\nWillkommen im Erwachsenenleben. 🧾",
+    "Alle reden über Flächen und Volumen.\n\nDu rechnest sie einfach aus. Kein Stress. 📐",
+    "Pythagoras ist seit 2500 Jahren tot.\n\nUnd du kannst trotzdem, was er konnte. Das musst du erstmal sacken lassen. 🏛️"
   ],
 
   /* --- 8. LOB WÄHREND DES SPIELS -------------------------- */
@@ -82,7 +92,12 @@ const CONFIG = {
     ["🐈‍⬛","Kuro"],     ["🌙","Tsuki"],   ["🗿","Moai"],     ["🍥","Naru"],     ["✨","Kira"],
     ["🦑","Ika"],      ["🎐","Furin"],   ["🐸","Kero"],     ["🍄","Pilzo"],    ["🌸","Sakura"],
     ["🤖","Robo-Ken"], ["🪐","Planeta"], ["🐺","Okami"],    ["🔥","Hono"],     ["❄️","Yuki"],
-    ["🦋","Chou"],     ["🌊","Nami"],    ["🥷","Shinobi"],  ["👑","Kaiser"],   ["🏆","Legende"]
+    ["🦋","Chou"],     ["🌊","Nami"],    ["🥷","Shinobi"],  ["👑","Kaiser"],   ["🏆","Legende"],
+    ["❄️","Frost"],    ["🧊","Kori"],    ["🐧","Pingu"],    ["🌬️","Kaze"],     ["⛄","Yukio"],
+    ["⚖️","Balance"],  ["🔗","Kette"],   ["🎚️","Regler"],   ["🧭","Kompass"],  ["♾️","Endlos"],
+    ["🏷️","Tagger"],   ["💎","Kristall"],["🏦","Tresor"],   ["📈","Kurve"],    ["💰","Schatz"],
+    ["📐","Winkel"],   ["🧱","Baustein"],["🎲","Würfel"],   ["🔷","Prisma"],   ["🗼","Turm"],
+    ["🧮","Rechner"],  ["🔑","Schlüssel"],["🧩","Puzzle"],  ["🏛️","Pythas"],   ["🌟","Meister"]
   ],
 
   /* --- 10. STREAK-JOKER ------------------------------------

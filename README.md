@@ -10,15 +10,18 @@ Dyskalkulie bleibt eine Lerntherapie der eigentliche Hebel.
 
 ## Was die App macht
 
-- **6 Kapitel** mit je 5 Levels: Plus/Minus → Mal/Geteilt → Geld & Größen →
-  Textaufgaben → Brüche & Prozent → Runden & Schätzen
+- **11 Kapitel** mit je 5 Levels, in zwei Gruppen:
+  - *Grundlagen (Klasse 4–6):* Plus/Minus · Mal/Geteilt · Geld & Größen ·
+    Textaufgaben · Brüche & Prozent · Runden & Schätzen
+  - *Aufbau (Klasse 7–9):* Minus-Zahlen · Dreisatz · Prozent & Zinsen ·
+    Flächen & Körper · Gleichungen & Pythagoras
 - **Unbegrenzt viele Aufgaben.** Jede Stufe hat einen Generator statt einer
   festen Fragenliste — die Aufgaben gehen nie aus und sind nie auswendig gelernt.
 - **Ausgleich statt Frust.** Nach 2 Fehlern in Folge wird die nächste Aufgabe
   leichter, nach 3 Treffern wieder schwerer. Kein Timer, keine Leben, keine Strafe.
 - **Falsches kommt zurück.** Eine falsch beantwortete Aufgabe taucht 3 und 8
   Aufgaben später erneut auf, sichtbar als "Nochmal" markiert.
-- **Sammelalbum.** Jedes geschaffte Level bringt ein Crew-Mitglied — 30 insgesamt.
+- **Sammelalbum.** Jedes geschaffte Level bringt ein Crew-Mitglied — 55 insgesamt.
 - **Streak-Joker.** Ein ausgelassener Tag pro Woche kostet die Serie nicht.
 - **Anschauungsbilder.** Bruchkreise und Punktefelder, teils direkt bei der
   Aufgabe, teils erst als Hilfe nach einem Fehler.
@@ -56,8 +59,10 @@ Dazu kommen LRS und Dyskalkulie:
 - **Kurze Sätze.** Textaufgaben stehen in Einzelsätzen, eine Information pro
   Zeile, längste Zeile rund 40 Zeichen.
 - **Zwanzigerfeld und Zahlenstrahl.** Die Standard-Anschauungsmittel gegen
-  zählendes Rechnen. Rund 38 % der Aufgaben haben ein Mengenbild — bei den
-  ersten Stufen direkt sichtbar, sonst als Hilfe nach einem Fehler.
+  zählendes Rechnen. Rund 42 % der Aufgaben haben ein Bild — bei den ersten
+  Stufen direkt sichtbar, sonst als Hilfe nach einem Fehler. In den
+  Aufbau-Kapiteln kommen Thermometer-Skala für negative Zahlen sowie
+  maßstäbliche Zeichnungen für Flächen, Körper und Pythagoras dazu.
 
 ## Dateien
 
@@ -78,4 +83,6 @@ gespeichert und verlässt den Rechner nicht.
 
 - Verpackung als Windows-Installer (Electron), damit die App ein Desktop-Icon
   bekommt und ohne Browser startet
-- Klassenstufen 6–9 als weitere Kapitel
+- Vorlesen auf einem Rechner mit Audioausgabe prüfen (auf einer Server-
+  oder Remote-Sitzung meldet Windows "synthesis-failed", weil dort kein
+  Audiogerät vorhanden ist)
