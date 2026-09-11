@@ -94,8 +94,19 @@ Sicherung anlegen (empfohlen, dauert 20 Sekunden)
     1. Auf "Sicherung erzeugen" klicken.
        Der Text wird erzeugt, markiert und in die Zwischenablage
        gelegt.
-    2. Mit Strg+V in eine Textdatei einfügen und speichern,
-       zum Beispiel als  Sicherung.txt  neben die App.
+    2. Mit Strg+V irgendwo einfügen und speichern. Es geht:
+         - der Windows-Editor (Notepad)  ->  am einfachsten
+         - Word                          ->  geht auch
+         - eine E-Mail an sich selbst    ->  geht auch
+       Speichern Sie sie zum Beispiel als  Sicherung  neben die App.
+
+       Der Text ist lang (bei vollem Fortschritt rund 8000 Zeichen,
+       also etwa zwei Seiten). Das ist normal — er wird kopiert,
+       nicht abgetippt.
+
+       Der Text besteht nur aus Großbuchstaben und den Ziffern 2 bis 7.
+       Das ist Absicht: So kann die Autokorrektur von Word nichts
+       daran verschlimmbessern.
 
     Wiederherstellen geht genauso rückwärts: Text kopieren, im
     selben Feld einfügen, auf "Sicherung einlesen" klicken.

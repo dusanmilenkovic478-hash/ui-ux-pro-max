@@ -1,0 +1,86 @@
+<script>
+var LOG=[],FEHLER=[];
+window.onerror=function(m,f,l){FEHLER.push("JS-Fehler: "+m+" @"+l);};
+function pruefe(n,b){ b?LOG.push(n):FEHLER.push("FEHLGESCHLAGEN: "+n); }
+var echtesConfirm=window.confirm; window.confirm=function(){return true;};
+
+function baueStand(){
+  var st=leererStand();
+  st.richtigGesamt=412; st.crewHabe=[0,1,2,3,4,5,6,7];
+  st.kapitel[0].levelFertig=5; st.kapitel[1].levelFertig=3; st.kapitel[8].levelFertig=2;
+  st.streak=14; st.heuteZahl=9; st.lesehilfe=true; st.sprachVariante=2;
+  st.stats={"k0s1":{versuche:60,richtig:54},"k8s3":{versuche:20,richtig:11}};
+  st.gutscheine={
+    "k1l1":{was:CONFIG.belohnungen[1][0],code:"M-K1L1-4711",eingeloest:true},
+    "k9l5":{was:CONFIG.belohnungen[9][4],code:"M-K9L5-3030",eingeloest:false}};
+  st.testWoche={woche:wochenSchluessel(),versuche:1,bestanden:true,eingeloest:true};
+  st.notizMitUmlauten="Prüfung: süß, groß, Straße, Öl, Ähre — 100 %";
+  return st;
+}
+
+try{
+  var original=baueStand();
+  var text=inText(original);
+
+  pruefe("Kennung am Anfang", text.replace(/ /g,"").indexOf("MALTE2")===0);
+  pruefe("Nur unkritische Zeichen", /^[A-Z2-7 ]+$/.test(text));
+  pruefe("Keine Klein- oder Sonderzeichen", !/[a-z+\/=]/.test(text));
+  pruefe("In Gruppen geteilt", text.indexOf(" ")>0);
+
+  function rund(t, name, sollKlappen){
+    var zurueck=null, fehler=null;
+    try{ zurueck=ausText(t); }catch(e){ fehler=e.message; }
+    if(sollKlappen) pruefe(name, zurueck && JSON.stringify(zurueck)===JSON.stringify(original));
+    else pruefe(name, zurueck===null);
+  }
+
+  rund(text, "Unveraendert lesbar", true);
+  pruefe("Umlaute ueberstehen die Kodierung", ausText(text).notizMitUmlauten==="Prüfung: süß, groß, Straße, Öl, Ähre — 100 %");
+
+  // --- Das, was Word mit dem Text macht ---
+  rund(text.charAt(0).toUpperCase()+text.slice(1), "Word: Satzanfang gross", true);
+  rund(text.toLowerCase(), "Word: alles klein geschrieben", true);
+  rund(text.replace(/ /g,"\n"), "Word: Zeilenumbrueche statt Leerzeichen", true);
+  rund("   "+text+"  \n\n", "Word: Leerzeilen drumherum", true);
+  rund(text.replace(/ /g,"  "), "Word: doppelte Leerzeichen", true);
+  rund(text.replace(/ /g,"\t"), "Word: Tabulatoren", true);
+  rund(text.split(" ").join("\r\n"), "Windows-Zeilenenden", true);
+  // Word ersetzt Anfuehrungszeichen und Bindestriche - im Zeichenvorrat kommen sie gar nicht vor
+  pruefe("Keine Zeichen, die Word ersetzen wuerde", !/["'`\-–—…]/.test(text));
+
+  // --- Was wirklich kaputt ist, muss auffallen ---
+  rund("Sehr geehrte Damen und Herren", "Fremder Text wird abgelehnt", false);
+  rund("", "Leerer Text wird abgelehnt", false);
+  rund("MALTE2 ABC", "Abgeschnittener Text wird abgelehnt", false);
+
+  // --- Alte Sicherungen muessen weiter funktionieren ---
+  var bytes=new TextEncoder().encode(JSON.stringify(original));
+  var roh=""; for(var i=0;i<bytes.length;i++) roh+=String.fromCharCode(bytes[i]);
+  var altText="MALTE1:"+btoa(roh);
+  var ausAlt=ausText(altText);
+  pruefe("Sicherung der ersten Fassung lesbar", ausAlt.richtigGesamt===412 && ausAlt.gutscheine["k1l1"].was===CONFIG.belohnungen[1][0]);
+
+  // --- Groesse ---
+  pruefe("Sicherung bleibt handlich", text.length<9000);
+  LOG.push("Laenge: "+text.length+" Zeichen");
+
+  // --- Ueber die Oberflaeche ---
+  stand=baueStand();
+  document.getElementById("btn-eltern").click();
+  document.getElementById("eltern-pin").value="0902";
+  document.getElementById("btn-eltern-pin").click();
+  document.getElementById("btn-sicher-erzeugen").click();
+  var ausFeld=document.getElementById("sicherung-feld").value;
+  pruefe("Knopf erzeugt Word-festen Text", /^[A-Z2-7 ]+$/.test(ausFeld));
+
+  stand=leererStand();
+  // so einfuegen, wie es aus Word zurueckkaeme
+  document.getElementById("sicherung-feld").value=ausFeld.toLowerCase().replace(/ /g,"\n");
+  document.getElementById("btn-sicher-einlesen").click();
+  pruefe("Aus Word zurueck: Fortschritt wieder da", stand.richtigGesamt===412);
+  pruefe("Aus Word zurueck: Gutschein-Text wieder da", stand.gutscheine["k1l1"].was===CONFIG.belohnungen[1][0]);
+  pruefe("Aus Word zurueck: Einloesestatus stimmt", stand.gutscheine["k1l1"].eingeloest===true && stand.gutscheine["k9l5"].eingeloest===false);
+}catch(e){ FEHLER.push("ABSTURZ: "+e.message+" | "+(e.stack||"").split("\n")[1]); }
+window.confirm=echtesConfirm;
+document.title = FEHLER.length ? ("### "+FEHLER.length+" PROBLEME ### "+FEHLER.join(" ;; ")) : ("ALLE TESTS BESTANDEN ("+LOG.length+") — "+LOG[LOG.length-1]);
+</script>

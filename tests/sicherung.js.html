@@ -1,0 +1,83 @@
+<script>
+var LOG=[],FEHLER=[];
+window.onerror=function(m,f,l){FEHLER.push("JS-Fehler: "+m+" @"+l);};
+function pruefe(n,b){ b?LOG.push(n):FEHLER.push("FEHLGESCHLAGEN: "+n); }
+var echtesConfirm=window.confirm; window.confirm=function(){return true;};
+try{
+  pruefe("PIN ist 0902", CONFIG.elternPin==="0902");
+
+  // Fortschritt aufbauen, mit Umlauten und Sonderzeichen in den Gutscheinen
+  stand.richtigGesamt=347; stand.crewHabe=[0,1,2,3,4,5,6];
+  stand.kapitel[0].levelFertig=5; stand.kapitel[1].levelFertig=2;
+  stand.streak=11; stand.heuteZahl=13;
+  stand.stats={"k0s1":{versuche:40,richtig:35},"k9s4":{versuche:12,richtig:7}};
+  stand.gutscheine={"k1l1":{was:CONFIG.belohnungen[1][0],code:"M-K1L1-4711",eingeloest:true},
+                    "k2l5":{was:CONFIG.belohnungen[2][4],code:"M-K2L5-8080",eingeloest:false}};
+  stand.textMitUmlauten="süß, groß, Straße, Öl — 100 %";
+  stand.testWoche={woche:wochenSchluessel(),versuche:1,bestanden:true,eingeloest:false};
+  stand.lesehilfe=true; stand.sprachVariante=2;
+
+  var original=JSON.parse(JSON.stringify(stand));
+  var text=inText(stand);
+  pruefe("Sicherungstext hat Kennung", text.replace(/ /g,"").indexOf("MALTE2")===0);
+  pruefe("Sicherungstext ist kompakt", text.length<6000);
+  pruefe("Sicherungstext ohne Zeilenumbrueche", text.indexOf("\n")<0);
+  pruefe("Sicherungstext ist Word-fest", /^[A-Z2-7 ]+$/.test(text));
+
+  var zurueck=ausText(text);
+  pruefe("Anzahl richtiger Antworten erhalten", zurueck.richtigGesamt===347);
+  pruefe("Crew erhalten", zurueck.crewHabe.length===7);
+  pruefe("Level erhalten", zurueck.kapitel[0].levelFertig===5 && zurueck.kapitel[1].levelFertig===2);
+  pruefe("Serie erhalten", zurueck.streak===11);
+  pruefe("Statistik erhalten", zurueck.stats["k9s4"].richtig===7);
+  pruefe("Umlaute heil geblieben", zurueck.textMitUmlauten==="süß, groß, Straße, Öl — 100 %");
+  pruefe("Gutscheintext aus der Konfiguration", zurueck.gutscheine["k2l5"].was===CONFIG.belohnungen[2][4]);
+  pruefe("Einloesestatus erhalten", zurueck.gutscheine["k1l1"].eingeloest===true && zurueck.gutscheine["k2l5"].eingeloest===false);
+  pruefe("Wochentest erhalten", zurueck.testWoche.bestanden===true);
+  pruefe("Lesehilfe erhalten", zurueck.lesehilfe===true);
+  pruefe("Vorlese-Einstellung erhalten", zurueck.sprachVariante===2);
+  pruefe("Sicherung vollstaendig identisch", JSON.stringify(zurueck)===JSON.stringify(original));
+
+  // Ueber die Oberflaeche: erzeugen, alles loeschen, wieder einlesen
+  document.getElementById("btn-eltern").click();
+  document.getElementById("eltern-pin").value="0902";
+  document.getElementById("btn-eltern-pin").click();
+  pruefe("Eltern-Bereich oeffnet mit neuer PIN", !document.getElementById("eltern-inhalt").hidden);
+  document.getElementById("btn-sicher-erzeugen").click();
+  var gesichert=document.getElementById("sicherung-feld").value;
+  pruefe("Knopf erzeugt einen Text", gesichert.length>100);
+
+  stand=leererStand();
+  pruefe("Fortschritt ist geloescht", stand.richtigGesamt===0);
+  document.getElementById("sicherung-feld").value=gesichert;
+  document.getElementById("btn-sicher-einlesen").click();
+  pruefe("Fortschritt ist zurueck", stand.richtigGesamt===347);
+  pruefe("Crew ist zurueck", stand.crewHabe.length===7);
+  pruefe("Gutschein ist zurueck", stand.gutscheine["k1l1"].was===CONFIG.belohnungen[1][0]);
+  pruefe("Meldung bestaetigt den Vorgang", document.getElementById("sicherung-meldung").textContent.indexOf("347")>0);
+
+  // Sicherung mit Leerzeichen und Zeilenumbruechen (wie aus einer Textdatei kopiert)
+  stand=leererStand();
+  document.getElementById("sicherung-feld").value="  "+gesichert.slice(0,50)+"\n"+gesichert.slice(50)+"  \n";
+  document.getElementById("btn-sicher-einlesen").click();
+  pruefe("Zerpflueckter Text wird trotzdem gelesen", stand.richtigGesamt===347);
+
+  // Unsinn darf nichts kaputt machen
+  stand.richtigGesamt=999;
+  document.getElementById("sicherung-feld").value="Hallo, das ist kein Code";
+  document.getElementById("btn-sicher-einlesen").click();
+  pruefe("Unsinn wird abgelehnt", stand.richtigGesamt===999);
+  pruefe("Ablehnung wird erklaert", document.getElementById("sicherung-meldung").textContent.length>20);
+  document.getElementById("sicherung-feld").value="";
+  document.getElementById("btn-sicher-einlesen").click();
+  pruefe("Leeres Feld wird abgefangen", stand.richtigGesamt===999);
+
+  // Sicherung aus einer aelteren Version mit nur 6 Kapiteln
+  var alt=leererStand(); alt.kapitel=alt.kapitel.slice(0,6); alt.richtigGesamt=88;
+  document.getElementById("sicherung-feld").value=inText(alt);
+  document.getElementById("btn-sicher-einlesen").click();
+  pruefe("Alte Sicherung wird ergaenzt", stand.kapitel.length===KAPITEL.length && stand.richtigGesamt===88);
+}catch(e){ FEHLER.push("ABSTURZ: "+e.message+" | "+(e.stack||"").split("\n")[1]); }
+window.confirm=echtesConfirm;
+document.title = FEHLER.length ? ("### "+FEHLER.length+" PROBLEME ### "+FEHLER.join(" ;; ")) : ("ALLE "+LOG.length+" TESTS BESTANDEN");
+</script>

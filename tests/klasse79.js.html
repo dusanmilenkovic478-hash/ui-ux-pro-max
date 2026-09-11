@@ -1,0 +1,148 @@
+<script>
+var LOG=[],FEHLER=[];
+window.onerror=function(m,f,l){FEHLER.push("JS-Fehler: "+m+" @"+l);};
+function pruefe(n,b){ b?LOG.push(n):FEHLER.push("FEHLGESCHLAGEN: "+n); }
+function gleich(n,ist,soll){ ist===soll?LOG.push(n):FEHLER.push(n+" -> bekam \""+ist+"\" statt \""+soll+"\""); }
+function knopfMit(txt){ return [].slice.call(document.getElementById("antworten").children).filter(function(b){return b.textContent===txt})[0]; }
+function klickRichtig(){ var t=knopfMit(quiz.aufgabe.antwort); if(!t){FEHLER.push("richtige Antwort fehlt");return;} t.click(); }
+function klickFalsch(){ [].slice.call(document.getElementById("antworten").children).filter(function(b){return b.textContent!==quiz.aufgabe.antwort})[0].click(); }
+function weiter(){ document.getElementById("btn-naechste").click(); }
+
+try{
+  // ===== A) Vorlese-Aussprache =====
+  gleich("plus",        sprechText("3 + 4"), "3 plus 4");
+  gleich("minus",       sprechText("18 − 5"), "18 minus 5");
+  gleich("mal",         sprechText("6 · 7"), "6 mal 7");
+  gleich("geteilt",     sprechText("12 : 3"), "12 geteilt durch 3");
+  gleich("Uhrzeit",     sprechText("Er endet um 14:30 Uhr"), "Er endet um 14 Uhr 30");
+  gleich("Bruch 3/4",   sprechText("3/4"), "drei Viertel");
+  gleich("Bruch 2/3",   sprechText("2/3"), "zwei Drittel");
+  gleich("Geld",        sprechText("2,50 €"), "2 Euro 50");
+  gleich("Cent",        sprechText("0,80 €"), "80 Cent");
+  gleich("volle Euro",  sprechText("3,00 €"), "3 Euro");
+  gleich("Prozent",     sprechText("25 %"), "25 Prozent");
+  gleich("Kilogramm",   sprechText("3 kg und 400 g"), "3 Kilogramm und 400 Gramm");
+  gleich("Zentimeter",  sprechText("2 m und 30 cm"), "2 Meter und 30 Zentimeter");
+  gleich("Platzhalter", sprechText("40 + ☐ = 90"), "40 plus wie viel = 90");
+  gleich("Zeilen",      sprechText("Du sparst 5 €.\nWie viel fehlt?"), "Du sparst 5 Euro. Wie viel fehlt?");
+  pruefe("kein NaN/undefined beim Vorlesen",
+    ["3 + 4","1/2","14:30 Uhr","0,05 €"].every(function(t){var r=sprechText(t);return r.indexOf("undefined")<0&&r.indexOf("NaN")<0;}));
+
+  // ===== B) Lesehilfe =====
+  setzeLesehilfe(true);
+  pruefe("Lesehilfe schaltet ein", document.documentElement.dataset.lesehilfe==="an");
+  pruefe("Lesehilfe wird gemerkt", stand.lesehilfe===true);
+  setzeLesehilfe(false);
+  pruefe("Lesehilfe schaltet aus", document.documentElement.dataset.lesehilfe==="aus");
+
+  // ===== C) Wochentest: gesperrt an anderen Tagen =====
+  var heuteTag=new Date().getDay();
+  CONFIG.wochentest.tag=(heuteTag+3)%7;
+  stand.testWoche={woche:wochenSchluessel(),versuche:0,bestanden:false,eingeloest:false};
+  pruefe("Test an anderem Tag gesperrt", !testStatus().spielbar);
+  zeichneTestKachel();
+  pruefe("Kachel zeigt Wartezustand", document.getElementById("test-kachel").disabled);
+  pruefe("Kachel nennt den Wochentag", document.getElementById("tk-titel").textContent.indexOf("Wochentest am")===0);
+
+  // ===== D) Wochentest am richtigen Tag, bestanden =====
+  CONFIG.wochentest.tag=heuteTag;
+  stand.wocheThemen={"0|1":9,"1|2":7};
+  pruefe("Test heute spielbar", testStatus().spielbar);
+  pruefe("Themen kommen aus dem Geübten", testThemen().length===2);
+  zeichneTestKachel();
+  pruefe("Kachel ist anklickbar", !document.getElementById("test-kachel").disabled);
+
+  starteTest();
+  pruefe("Test laeuft", quiz.istTest===true);
+  pruefe("Spur hat Testlaenge", document.getElementById("spur").children.length===CONFIG.wochentest.aufgaben);
+  pruefe("Versuch wurde gezaehlt", stand.testWoche.versuche===1);
+  var richtigVorher=stand.richtigGesamt;
+  for(var i=0;i<CONFIG.wochentest.aufgaben;i++){ klickRichtig(); weiter(); }
+  pruefe("Ergebnis-Screen erscheint", !document.getElementById("s-testende").hidden);
+  gleich("Test bestanden", document.getElementById("test-titel").textContent, "Bestanden!");
+  pruefe("Belohnung sichtbar", document.getElementById("test-belohnung").textContent.indexOf("Roblox")>=0);
+  pruefe("Bestanden wird gemerkt", stand.testWoche.bestanden===true);
+  pruefe("Testantworten zaehlen zum Ziel", stand.richtigGesamt===richtigVorher+CONFIG.wochentest.aufgaben);
+  document.getElementById("test-pin").value=String(CONFIG.elternPin);
+  document.getElementById("btn-test-pin").click();
+  pruefe("Roblox-Gutschein einloesbar", !document.getElementById("test-stempel").hidden);
+  pruefe("Test nicht zweimal pro Woche", !testStatus().spielbar);
+
+  // ===== E) Wochentest nicht bestanden =====
+  stand.testWoche={woche:wochenSchluessel(),versuche:0,bestanden:false,eingeloest:false};
+  starteTest();
+  for(var j=0;j<CONFIG.wochentest.aufgaben;j++){ klickFalsch(); weiter(); }
+  gleich("Nicht bestanden", document.getElementById("test-titel").textContent, "Diesmal nicht ganz");
+  pruefe("Keine Belohnung bei Misserfolg", document.getElementById("test-gutschein").hidden);
+  pruefe("Zweiter Versuch angeboten", !document.getElementById("btn-test-nochmal").hidden);
+  starteTest();
+  for(var m=0;m<CONFIG.wochentest.aufgaben;m++){ klickFalsch(); weiter(); }
+  pruefe("Nach 2 Fehlversuchen Schluss", document.getElementById("btn-test-nochmal").hidden);
+  pruefe("Test jetzt gesperrt", !testStatus().spielbar);
+
+  // ===== F) Regression: normales Level laeuft weiter =====
+  document.getElementById("btn-test-heim").click();
+  var crewVorher=stand.crewHabe.length;
+  starteLevel(0,1);
+  pruefe("Level nicht im Testmodus", !quiz.istTest);
+  pruefe("Spur hat Levellaenge", document.getElementById("spur").children.length===CONFIG.aufgabenProLevel);
+  pruefe("Vorlese-Knopf sichtbar", !document.getElementById("btn-hoeren").hidden);
+  pruefe("Mengenbild bei Stufe 1 sichtbar", !document.getElementById("bild-box").hidden);
+  for(var n=0;n<CONFIG.aufgabenProLevel;n++){ klickRichtig(); weiter(); }
+  pruefe("Level-Screen statt Test-Screen", !document.getElementById("s-level").hidden);
+  pruefe("Crew waechst weiter", stand.crewHabe.length===crewVorher+1);
+
+  // ===== G) Regression: Wiederholung im Level, nicht im Test =====
+  starteLevel(1,3);
+  var sahNochmal=false;
+  for(var q=0;q<CONFIG.aufgabenProLevel;q++){ klickFalsch(); if(quiz.istWiederholung) sahNochmal=true; weiter(); }
+  pruefe("Wiederholung im Level aktiv", sahNochmal);
+}catch(e){ FEHLER.push("ABSTURZ: "+e.message+" | "+(e.stack||"").split("\n")[1]); }
+document.title = FEHLER.length ? ("### "+FEHLER.length+" PROBLEME ### "+FEHLER.join(" ;; ")) : ("ALLE "+LOG.length+" TESTS BESTANDEN");
+</script><script>
+try{
+  // ===== Klasse 7 bis 9 =====
+  pruefe("Elf Kapitel vorhanden", KAPITEL.length===11);
+  pruefe("Zwei Gruppen", GRUPPEN.length===2);
+  pruefe("55 Gutscheine hinterlegt", Object.values(CONFIG.belohnungen).flat().length===55);
+  pruefe("55 Crew-Mitglieder", CONFIG.crew.length===55);
+  pruefe("Spruch je Kapitel", CONFIG.kapitelSprueche.length===11);
+
+  heim();
+  pruefe("Kapitelliste zeigt Gruppen", document.querySelectorAll("#kapitel-liste .gruppe-titel").length===2);
+  pruefe("Kapitelliste zeigt elf Kapitel", document.querySelectorAll("#kapitel-liste .kap").length===11);
+
+  // Letztes Kapitel komplett durchspielen: Gutschein, Crew, Spruch
+  stand.kapitel[10].levelFertig=4;
+  var crewVorher=stand.crewHabe.length;
+  starteLevel(10,5);
+  pruefe("Pythagoras zeigt eine Zeichnung", !document.getElementById("bild-box").hidden);
+  for(var i=0;i<CONFIG.aufgabenProLevel;i++){ klickRichtig(); weiter(); }
+  pruefe("Gutschein fuer Kapitel 11", document.getElementById("gutschein-was").textContent.length>3);
+  pruefe("55. Crew-Mitglied vergeben", stand.crewHabe.indexOf(54)>=0 && stand.crewHabe.length===crewVorher+1);
+  document.getElementById("btn-level-weiter").click();
+  pruefe("Kapitelende erreicht", !document.getElementById("s-kapitelende").hidden);
+  pruefe("Spruch fuer Kapitel 11", document.getElementById("witz-text").textContent.indexOf("Pythagoras")>=0);
+  pruefe("Kein Weiter nach dem letzten Kapitel", document.getElementById("btn-ende-weiter").hidden);
+
+  // Album mit allen 55
+  document.getElementById("btn-ende-heim").click();
+  document.getElementById("btn-album").click();
+  pruefe("Album zeigt 55 Karten", document.querySelectorAll("#album-gitter .karte").length===55);
+  pruefe("Album ist nach Gruppen geteilt", document.querySelectorAll("#album-gitter .gruppe-titel").length===2);
+
+  // Jedes neue Kapitel einmal anspielen
+  document.getElementById("btn-album-zurueck").click();
+  for(var k=6;k<11;k++){
+    for(var st=1;st<=5;st++){
+      starteLevel(k,st);
+      pruefe("K"+(k+1)+" S"+st+" liefert eine Aufgabe", quiz.aufgabe && quiz.aufgabe.frage.length>2);
+      pruefe("K"+(k+1)+" S"+st+" hat vier Antworten", document.getElementById("antworten").children.length===4);
+      klickRichtig();
+      pruefe("K"+(k+1)+" S"+st+" wertet richtig", quiz.ergebnisse[0]===true);
+    }
+  }
+  document.title = FEHLER.length ? ("### "+FEHLER.length+" PROBLEME ### "+FEHLER.join(" ;; ")) : ("ALLE "+LOG.length+" TESTS BESTANDEN");
+}catch(e){ FEHLER.push("ABSTURZ: "+e.message+" | "+(e.stack||"").split("\n")[1]);
+  document.title="### "+FEHLER.length+" PROBLEME ### "+FEHLER.join(" ;; "); }
+</script>

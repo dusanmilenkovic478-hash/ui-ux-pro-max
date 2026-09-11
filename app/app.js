@@ -903,20 +903,87 @@ function zeichneEltern(entsperrt) {
    Browser ihn nicht mehr. Damit das nicht schlimm ist, lässt er
    sich als Text sichern und überall wieder einlesen.
    ============================================================ */
-const SICHER_KOPF = "MALTE1:";
+const SICHER_KOPF = "MALTE2";
+
+/* Nur Großbuchstaben und die Ziffern 2 bis 7. Das ist Absicht:
+   Textprogramme wie Word korrigieren gern automatisch — sie machen
+   Kleinbuchstaben am Zeilenanfang groß und ersetzen Sonderzeichen.
+   Bei diesem Zeichenvorrat gibt es nichts zu verschlimmbessern. */
+const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+function zuBase32(bytes) {
+  let bits = 0, wert = 0, text = "";
+  for (const b of bytes) {
+    wert = ((wert << 8) | b) & 0xFFFFF;
+    bits += 8;
+    while (bits >= 5) { text += B32[(wert >>> (bits - 5)) & 31]; bits -= 5; }
+  }
+  if (bits > 0) text += B32[(wert << (5 - bits)) & 31];
+  return text;
+}
+
+function vonBase32(text) {
+  let bits = 0, wert = 0;
+  const bytes = [];
+  for (const zeichen of text.toUpperCase()) {
+    const i = B32.indexOf(zeichen);
+    if (i < 0) continue;                      // Leerzeichen und Umbrüche einfach überspringen
+    wert = ((wert << 5) | i) & 0xFFFFF;
+    bits += 5;
+    if (bits >= 8) { bytes.push((wert >>> (bits - 8)) & 255); bits -= 8; }
+  }
+  return new Uint8Array(bytes);
+}
+
+/* Der Sicherungstext wird kürzer, wenn die Belohnungstexte draußen
+   bleiben — die stehen ohnehin in config.js und werden beim Einlesen
+   von dort wieder ergänzt. */
+function packen(st) {
+  const klein = Object.assign({}, st);
+  klein.gutscheine = {};
+  for (const [schluessel, g] of Object.entries(st.gutscheine || {}))
+    klein.gutscheine[schluessel] = [g.code, g.eingeloest ? 1 : 0];
+  return klein;
+}
+
+function auspacken(klein) {
+  const st = Object.assign({}, klein);
+  st.gutscheine = {};
+  for (const [schluessel, wert] of Object.entries(klein.gutscheine || {})) {
+    if (!Array.isArray(wert)) { st.gutscheine[schluessel] = wert; continue; }   // altes Format
+    const treffer = schluessel.match(/^k(\d+)l(\d+)$/);
+    const liste = treffer && CONFIG.belohnungen[Number(treffer[1])];
+    st.gutscheine[schluessel] = {
+      was: (liste && liste[Number(treffer[2]) - 1]) || "Belohnung",
+      code: wert[0],
+      eingeloest: wert[1] === 1
+    };
+  }
+  return st;
+}
 
 function inText(objekt) {
-  const bytes = new TextEncoder().encode(JSON.stringify(objekt));
-  let roh = "";
-  for (const b of bytes) roh += String.fromCharCode(b);
-  return SICHER_KOPF + btoa(roh);
+  const bytes = new TextEncoder().encode(JSON.stringify(packen(objekt)));
+  const roh = SICHER_KOPF + zuBase32(bytes);
+  // In Fünfergruppen — so bleibt der Text übersichtlich und lässt sich
+  // notfalls sogar abtippen. Die Leerzeichen werden beim Lesen ignoriert.
+  return roh.match(/.{1,5}/g).join(" ");
 }
+
 function ausText(text) {
-  const sauber = String(text).trim().replace(/\s+/g, "");
-  if (!sauber.startsWith(SICHER_KOPF)) throw new Error("Das ist kein Sicherungstext.");
-  const roh = atob(sauber.slice(SICHER_KOPF.length));
-  const bytes = Uint8Array.from(roh, c => c.charCodeAt(0));
-  return JSON.parse(new TextDecoder().decode(bytes));
+  const sauber = String(text).replace(/\s+/g, "").toUpperCase();
+  if (sauber.startsWith("MALTE2")) {
+    const bytes = vonBase32(sauber.slice(6));
+    return auspacken(JSON.parse(new TextDecoder().decode(bytes)));
+  }
+  // Sicherungen der ersten Fassung weiterhin lesen können
+  const alt = String(text).trim().replace(/\s+/g, "");
+  if (alt.startsWith("MALTE1:")) {
+    const roh = atob(alt.slice(7));
+    const bytes = Uint8Array.from(roh, c => c.charCodeAt(0));
+    return auspacken(JSON.parse(new TextDecoder().decode(bytes)));
+  }
+  throw new Error("Das ist kein Sicherungstext.");
 }
 
 function sicherungErzeugen() {

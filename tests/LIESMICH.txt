@@ -1,0 +1,14 @@
+TESTS
+=====
+Diese Dateien prüfen die App automatisch. Sie sind für die
+Weiterentwicklung gedacht, nicht für den täglichen Gebrauch.
+
+aufgaben-pruefen.js
+    Erzeugt 22.000 Aufgaben über alle Kapitel und meldet fehlende,
+    doppelte oder krumme Antworten.
+    Aufruf:  node tests/aufgaben-pruefen.js
+
+klasse79.js.html, sicherung.js.html, word.js.html
+    Testskripte, die in die gebaute malteslife.html eingehängt und
+    im Browser ausgeführt werden. Das Ergebnis steht dann im
+    Seitentitel.
