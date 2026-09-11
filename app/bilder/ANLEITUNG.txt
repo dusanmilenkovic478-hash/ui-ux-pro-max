@@ -1,0 +1,28 @@
+EIGENE HINTERGRUNDBILDER EINBAUEN
+=================================
+
+1. Legen Sie Ihre Bilddateien in genau diesen Ordner.
+   Erlaubt: .jpg  .jpeg  .png  .webp
+
+2. Öffnen Sie die Datei  app/config.js  mit einem Texteditor
+   (unter Windows z.B. Editor / Notepad).
+
+3. Suchen Sie die Zeile:
+
+       hintergrundBilder: [],
+
+   Tragen Sie die Dateinamen ein, jeder in Anführungszeichen,
+   getrennt durch Kommas:
+
+       hintergrundBilder: ["bild1.jpg", "bild2.png"],
+
+4. Speichern, App neu starten. Fertig.
+
+Die Bilder wechseln pro Kapitel und liegen dezent im Hintergrund,
+damit die Aufgabe gut lesbar bleibt. Die Stärke stellen Sie
+in derselben Datei ein bei:  bilderDeckkraft
+
+WICHTIG: Bitte nur Bilder verwenden, die Sie verwenden dürfen.
+Für den privaten Gebrauch auf dem eigenen Laptop ist das
+unproblematisch. Sobald die App weitergegeben oder online
+gestellt wird, gilt das Urheberrecht der Bildrechteinhaber.
