@@ -44,3 +44,10 @@ const ziel = pfad.join(__dirname, "malteslife.html");
 fs.writeFileSync(ziel, seite, "utf8");
 const groesse = (fs.statSync(ziel).size / 1024).toFixed(0);
 console.log(`malteslife.html gebaut — ${groesse} KB, eine Datei, läuft offline.`);
+
+/* --- Windows-Paket aktualisieren, falls es schon angelegt ist --- */
+const paketOrdner = pfad.join(__dirname, "windows-paket");
+if (fs.existsSync(paketOrdner)) {
+  fs.copyFileSync(ziel, pfad.join(paketOrdner, "MaltesLife.html"));
+  console.log("windows-paket/MaltesLife.html mit aktualisiert.");
+}

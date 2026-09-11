@@ -1,0 +1,96 @@
+﻿MALTE'S LIFE — auf dem Windows-Laptop einrichten
+================================================
+Dauert etwa zwei Minuten. Es wird nichts "installiert",
+nichts in Windows eingetragen und nichts verändert.
+Die App ist ein Ordner, den man auch einfach wieder löschen kann.
+
+
+SCHRITT 1 — Ordner anlegen
+--------------------------
+Kopieren Sie alle drei Dateien aus diesem Paket in einen Ordner
+auf dem Laptop, zum Beispiel:
+
+    C:\Malte
+
+Die drei Dateien müssen zusammen in EINEM Ordner bleiben:
+    MaltesLife.html
+    Malte's Life starten.bat
+    malteslife.ico
+
+
+SCHRITT 2 — Einmal testen
+-------------------------
+Doppelklick auf   Malte's Life starten.bat
+
+Kurz blitzt ein schwarzes Fenster auf, dann öffnet sich die App
+in einem eigenen Fenster ohne Browser-Leiste.
+
+Falls Windows warnt ("Der Computer wurde geschützt"):
+    auf "Weitere Informationen" klicken
+    dann auf "Trotzdem ausführen"
+Das kommt, weil die Datei aus dem Internet stammt. Sie können
+die Datei auch vorher freigeben:
+    Rechtsklick auf die .bat  ->  Eigenschaften
+    ->  ganz unten Haken bei "Zulassen"  ->  OK
+
+
+SCHRITT 3 — Symbol auf den Desktop
+----------------------------------
+    Rechtsklick auf  Malte's Life starten.bat
+    ->  Senden an  ->  Desktop (Verknüpfung erstellen)
+
+Auf dem Desktop erscheint ein Symbol. Umbenennen in
+"Malte's Life".
+
+
+SCHRITT 4 — Schöneres Symbol (freiwillig)
+-----------------------------------------
+    Rechtsklick auf das neue Desktop-Symbol
+    ->  Eigenschaften
+    ->  Knopf "Anderes Symbol..."
+    ->  "Durchsuchen..."
+    ->  die Datei  malteslife.ico  aus dem Ordner auswählen
+    ->  OK, OK
+
+Im selben Fenster können Sie unter "Ausführen" auch
+"Minimiert" einstellen — dann blitzt das schwarze Fenster
+nicht mehr auf.
+
+
+SCHRITT 5 — An die Taskleiste (freiwillig)
+------------------------------------------
+    Rechtsklick auf das Desktop-Symbol
+    ->  An Taskleiste anheften
+
+
+FERTIG. Ein Klick, und die App startet.
+
+
+WAS SIE NOCH WISSEN SOLLTEN
+===========================
+
+Braucht die App Internet?
+    Nein. Sie läuft komplett offline.
+
+Wo wird der Fortschritt gespeichert?
+    Im Browser auf dem Laptop, nicht im Internet. Solange die App
+    aus demselben Ordner gestartet wird, bleibt alles erhalten.
+    Verschieben Sie den Ordner NICHT, sonst fängt der Fortschritt
+    von vorne an.
+
+Die PIN ändern
+    Die PIN steht noch auf 1234. Sagen Sie mir Ihre Wunsch-PIN,
+    dann baue ich sie ein und schicke die Datei neu. Ändern Sie
+    sie bitte nicht selbst in der HTML-Datei — da steht sie an
+    einer Stelle, die leicht zu übersehen ist.
+
+Das Vorlesen prüfen
+    In der App unten auf "FÜR ELTERN", PIN eingeben, ganz unten
+    auf "Vorlesen testen". Dort steht dann im Klartext, ob es
+    funktioniert. Auf einem normalen Laptop sollte es gehen —
+    auf Ihrem Arbeitszugang über den Server fehlt die Tonausgabe,
+    deshalb ging es dort nicht.
+
+Wenn etwas nicht geht
+    Schicken Sie mir, was auf dem Bildschirm steht. Die App sagt
+    inzwischen ziemlich genau, woran es hakt.
