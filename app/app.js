@@ -393,6 +393,7 @@ function zeichneStart() {
   const fertigeLevel = stand.kapitel.reduce((s, k) => s + k.levelFertig, 0);
   $("btn-weiter").textContent = (fertigeLevel === 0 && stand.richtigGesamt === 0) ? "▶ LOS GEHT'S" : "▶ WEITERMACHEN";
   $("album-zahl").textContent = `${stand.crewHabe.length}/${KAPITEL.length * 5}`;
+  vollbildKnopfAktualisieren();
 
   const offen = Object.values(stand.gutscheine).filter(g => !g.eingeloest).length;
   $("fuss-text").textContent = offen
@@ -1028,6 +1029,31 @@ function sicherungEinlesen() {
     `✓ Eingelesen: ${stand.richtigGesamt} richtige Antworten, ${stand.crewHabe.length} Levels.`;
 }
 
+/* ---------- Vollbild ---------- */
+const imVollbild = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+
+function vollbildKnopfAktualisieren() {
+  const k = $("btn-vollbild");
+  if (!k) return;
+  const wurzel = document.documentElement;
+  k.hidden = !(wurzel.requestFullscreen || wurzel.webkitRequestFullscreen);
+  k.textContent = imVollbild() ? "⛶ Vollbild aus" : "⛶ Vollbild";
+}
+
+function vollbildUmschalten() {
+  const wurzel = document.documentElement;
+  try {
+    if (imVollbild()) {
+      const raus = document.exitFullscreen || document.webkitExitFullscreen;
+      if (raus) raus.call(document);
+    } else {
+      const rein = wurzel.requestFullscreen || wurzel.webkitRequestFullscreen;
+      if (rein) rein.call(wurzel);
+    }
+  } catch (e) { /* manche Umgebungen erlauben es nicht — dann bleibt alles, wie es ist */ }
+  setTimeout(vollbildKnopfAktualisieren, 120);
+}
+
 /* ---------- Konfetti ---------- */
 function konfetti() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1115,6 +1141,10 @@ function verdrahten() {
 
   $("btn-sicher-erzeugen").addEventListener("click", sicherungErzeugen);
   $("btn-sicher-einlesen").addEventListener("click", sicherungEinlesen);
+
+  $("btn-vollbild").addEventListener("click", vollbildUmschalten);
+  document.addEventListener("fullscreenchange", vollbildKnopfAktualisieren);
+  document.addEventListener("webkitfullscreenchange", vollbildKnopfAktualisieren);
 
   $("btn-album").addEventListener("click", zeichneAlbum);
   $("btn-album-zurueck").addEventListener("click", heim);

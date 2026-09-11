@@ -69,6 +69,19 @@ FERTIG. Ein Klick, und die App startet.
 WAS SIE NOCH WISSEN SOLLTEN
 ===========================
 
+Vollbild
+    Die App startet in einem eigenen Fenster im Hochformat, etwa so
+    groß wie ein Handy. Das passt zum Aufbau der App.
+
+    Wer lieber den ganzen Bildschirm möchte:
+      - unten in der App auf "Vollbild" klicken, oder
+      - die Taste F11 drücken
+    Beides geht jederzeit wieder zurück. Die App merkt sich das
+    nicht, sie startet immer wieder im Fenster.
+
+    Das Fenster lässt sich auch ganz normal mit der Maus größer
+    ziehen oder oben rechts maximieren.
+
 Braucht die App Internet?
     Nein. Sie läuft komplett offline.
 

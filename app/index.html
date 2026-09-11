@@ -346,6 +346,13 @@ html[data-lesehilfe="an"] .witz p{letter-spacing:.035em;line-height:1.7}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+/* Viel Platz, etwa im Vollbild: etwas großzügiger setzen */
+@media (min-width:900px) and (min-height:820px){
+  body{font-size:17.5px}
+  #buehne{max-width:700px}
+  .aufgabe{min-height:170px}
+  .antwort{min-height:78px}
+}
 @media (max-width:380px){
   .antworten{grid-template-columns:1fr}
   .ring{flex-basis:88px;width:88px;height:88px}
@@ -409,6 +416,7 @@ html[data-lesehilfe="an"] .witz p{letter-spacing:.035em;line-height:1.7}
 
     <div class="knopf-reihe">
       <button class="mini" id="btn-album">🃏 Album <span id="album-zahl"></span></button>
+      <button class="mini" id="btn-vollbild">⛶ Vollbild</button>
       <button class="mini" id="btn-lesehilfe">Aa Lesehilfe</button>
       <button class="mini" id="btn-eltern">Für Eltern</button>
     </div>

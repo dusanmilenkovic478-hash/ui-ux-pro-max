@@ -26,7 +26,7 @@ if not exist "%BROWSER%" set "BROWSER=%ProgramFiles%\Google\Chrome\Application\c
 if not exist "%BROWSER%" set "BROWSER=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"
 
 if exist "%BROWSER%" (
-  start "" "%BROWSER%" --app="%ADRESSE%" --window-size=520,940
+  start "" "%BROWSER%" --app="%ADRESSE%" --window-size=520,860
 ) else (
   rem Kein Edge, kein Chrome: dann eben im Standardbrowser
   start "" "%SEITE%"
