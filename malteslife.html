@@ -1219,6 +1219,7 @@ const leererStand = () => ({
   wocheThemen: {},                       // "kapitel|stufe" -> wie oft geübt
   testWoche: { woche: wochenSchluessel(), versuche: 0, bestanden: false, eingeloest: false },
   lesehilfe: null,                       // null = Vorgabe aus config.js
+  sprachVariante: undefined,             // welche Vorlese-Einstellung auf diesem Gerät geht
   aktuellK: 0,
   aktuellL: 1
 });
@@ -1373,70 +1374,136 @@ function zeigeSprachProblem(grund) {
   if (knopf) { knopf.classList.remove("laeuft"); knopf.classList.add("kaputt"); }
 }
 
-/* Chrome verwirft das Sprach-Objekt, sobald keine Referenz mehr darauf
-   zeigt — dann passiert einfach nichts, ohne Fehlermeldung. Deshalb
-   halten wir es hier fest, bis es fertig gesprochen ist. */
-let laufendeRede = null;
+/* ============================================================
+   Chrome scheitert auf manchen Windows-Rechnern beim Sprechen
+   ("synthesis-failed"), je nachdem wie die Anfrage gestellt wird.
+   Welche Kombination geht, lässt sich nicht vorhersagen — also
+   probiert die App sie der Reihe nach durch und merkt sich die,
+   die funktioniert hat.
+   ============================================================ */
+const SPRACH_VARIANTEN = [
+  { name: "Deutsche Stimme, langsam",  rate: 0.88, stimme: 0 },
+  { name: "Deutsche Stimme, normal",   rate: 1,    stimme: 0 },
+  { name: "Ohne feste Stimme",         rate: 1,    stimme: null },
+  { name: "Ohne Sprachangabe",         rate: 1,    stimme: null, ohneLang: true },
+  { name: "Zweite deutsche Stimme",    rate: 1,    stimme: 1 },
+  { name: "Dritte deutsche Stimme",    rate: 1,    stimme: 2 },
+  { name: "Irgendeine Stimme",         rate: 1,    stimme: 0, egalWelcheSprache: true }
+];
+
+let laufendeRede = null;        // hält das Objekt fest, sonst räumt Chrome es weg
 let sprachVersuch = 0;
 
-function vorlesen(text, ohneStimme) {
+function deutscheStimmen() {
+  return stimmenListe().filter(v => /^de/i.test(v.lang));
+}
+
+function baueRede(text, v) {
+  const rede = new SpeechSynthesisUtterance(sprechText(text));
+  if (!v.ohneLang) rede.lang = "de-DE";
+  rede.rate = v.rate;
+  if (v.stimme !== null) {
+    const auswahl = v.egalWelcheSprache ? stimmenListe() : deutscheStimmen();
+    if (!auswahl[v.stimme]) return null;          // diese Variante gibt es hier nicht
+    // Schlägt das Setzen fehl, wird trotzdem gesprochen — nur eben mit
+    // der Stimme, die der Browser selbst wählt.
+    try { rede.voice = auswahl[v.stimme]; } catch (e) { /* ohne feste Stimme weiter */ }
+  }
+  return rede;
+}
+
+/* Einen einzelnen Anlauf starten. meldung(true) sobald Ton kommt,
+   meldung(false, grund) wenn er scheitert oder still bleibt. */
+function sprachAnlauf(text, index, meldung) {
+  const v = SPRACH_VARIANTEN[index];
+  if (!v) return meldung(false, "alle-versucht");
+
+  let rede;
+  try {
+    speechSynthesis.cancel();
+    rede = baueRede(text, v);
+  } catch (e) { return meldung(false, "blockiert"); }
+  if (!rede) return meldung(false, "variante-entfaellt");
+
+  laufendeRede = rede;
+  const meinVersuch = ++sprachVersuch;
+  let fertig = false;
+  const einmal = (ok, grund) => {
+    if (fertig || meinVersuch !== sprachVersuch) return;
+    fertig = true;
+    meldung(ok, grund);
+  };
+
+  const knopf = $("btn-hoeren");
+  rede.onstart = () => { if (knopf) knopf.classList.add("laeuft"); einmal(true); };
+  rede.onend   = () => { laufendeRede = null; if (knopf) knopf.classList.remove("laeuft"); };
+  rede.onerror = (e) => {
+    const grund = (e && e.error) || "kein-start";
+    laufendeRede = null;
+    if (knopf) knopf.classList.remove("laeuft");
+    if (grund === "interrupted" || grund === "canceled") { fertig = true; return; }
+    einmal(false, grund);
+  };
+
+  try {
+    speechSynthesis.speak(rede);
+    if (speechSynthesis.paused) speechSynthesis.resume();
+  } catch (e) { return einmal(false, "blockiert"); }
+
+  setTimeout(() => {
+    if (speechSynthesis.speaking || speechSynthesis.pending) return einmal(true);
+    einmal(false, "kein-start");
+  }, 1500);
+}
+
+/* Der Reihe nach durchprobieren, bis eine Variante Ton macht. */
+function sprachKaskade(text, abIndex, fertig) {
+  sprachAnlauf(text, abIndex, (ok, grund) => {
+    if (ok) { stand.sprachVariante = abIndex; sichern(); return fertig && fertig(true, abIndex); }
+    sprachProblem = grund;
+    if (abIndex + 1 < SPRACH_VARIANTEN.length) return sprachKaskade(text, abIndex + 1, fertig);
+    fertig && fertig(false, null);
+  });
+}
+
+function vorlesen(text) {
   const knopf = $("btn-hoeren");
   const feld = $("hoer-meldung");
-  if (feld && !ohneStimme) feld.hidden = true;
+  if (feld) feld.hidden = true;
 
   if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined")
     return zeigeSprachProblem("fehlt");
+  if (!stimmenListe().length) { holeStimme(); if (!stimmenListe().length) return zeigeSprachProblem("keine-stimme"); }
 
   // Läuft gerade etwas? Dann ist der Knopf ein Stopp-Knopf.
-  if (!ohneStimme && knopf && knopf.classList.contains("laeuft")) {
+  if (knopf && knopf.classList.contains("laeuft")) {
     try { speechSynthesis.cancel(); } catch (e) {}
     laufendeRede = null;
     knopf.classList.remove("laeuft");
     return;
   }
 
-  let rede;
-  try {
-    speechSynthesis.cancel();
-    rede = new SpeechSynthesisUtterance(sprechText(text));
-  } catch (e) { return zeigeSprachProblem("blockiert"); }
+  // Bekannte funktionierende Variante zuerst, sonst von vorn durchprobieren
+  const start = (typeof stand.sprachVariante === "number") ? stand.sprachVariante : 0;
+  sprachAnlauf(text, start, (ok, grund) => {
+    if (ok) return;
+    sprachProblem = grund;
+    sprachKaskade(text, start === 0 ? 1 : 0, (gelungen) => {
+      if (!gelungen) zeigeSprachProblem(sprachProblem || "kein-start");
+    });
+  });
+}
 
-  rede.lang = "de-DE";
-  rede.rate = 0.88;                   // etwas langsamer — hilft beim Mitlesen
-  // Beim zweiten Anlauf ohne feste Stimme: manche Browser sprechen nur
-  // mit ihrer eigenen Vorauswahl.
-  if (!ohneStimme) {
-    const stimme = deutscheStimme || holeStimme();
-    if (stimme) rede.voice = stimme;
-  }
-
-  laufendeRede = rede;                // <- verhindert das stille Verschlucken
-  const meinVersuch = ++sprachVersuch;
-  let startete = false;
-
-  rede.onstart = () => { startete = true; if (knopf) knopf.classList.add("laeuft"); };
-  rede.onend   = () => { laufendeRede = null; if (knopf) knopf.classList.remove("laeuft"); };
-  rede.onerror = (e) => {
-    const grund = (e && e.error) || "kein-start";
-    laufendeRede = null;
-    if (grund === "interrupted" || grund === "canceled") { if (knopf) knopf.classList.remove("laeuft"); return; }
-    if (!ohneStimme) return vorlesen(text, true);      // zweiter Anlauf
-    zeigeSprachProblem(grund);
-  };
-
-  try {
-    speechSynthesis.speak(rede);
-    if (speechSynthesis.paused) speechSynthesis.resume();
-  } catch (e) { return zeigeSprachProblem("blockiert"); }
-
-  // Nichts passiert? Erst den zweiten Anlauf, dann erst aufgeben.
-  // 1,6 s, weil die Sprachausgabe beim allerersten Mal länger braucht.
-  setTimeout(() => {
-    if (meinVersuch !== sprachVersuch) return;           // längst ein neuer Versuch
-    if (startete || speechSynthesis.speaking || speechSynthesis.pending) return;
-    if (!ohneStimme) return vorlesen(text, true);
-    zeigeSprachProblem(stimmenListe().length ? "kein-start" : "keine-stimme");
-  }, 1600);
+/* Probiert im Eltern-Bereich alle Varianten durch und sagt, welche geht. */
+function sprachLabor(anzeigen) {
+  if (!window.speechSynthesis) return anzeigen("Dieser Browser kennt keine Sprachausgabe.");
+  stand.sprachVariante = undefined;
+  anzeigen("Probiere alle Einstellungen durch …");
+  sprachKaskade("Test. Drei plus vier ist sieben.", 0, (ok, index) => {
+    if (ok) anzeigen(`✓ Es funktioniert mit der Einstellung „${SPRACH_VARIANTEN[index].name}". Die App merkt sich das.`);
+    else anzeigen(`Keine der ${SPRACH_VARIANTEN.length} Einstellungen hat funktioniert. Zuletzt gemeldet: ${sprachProblem}. `
+      + `Auf diesem Gerät kann die App nicht vorlesen — auf einem anderen Rechner meist schon.`);
+  });
 }
 
 /* Was kann dieses Gerät? Wird im Eltern-Bereich angezeigt. */
@@ -1449,8 +1516,8 @@ function sprachDiagnose() {
   t += ".";
   if (!alle.length) t += " Ohne installierte Stimme kann nicht vorgelesen werden.";
   if (sprachProblem) t += ` Zuletzt gemeldet: ${sprachProblem}.`;
-  if (window.speechSynthesis)
-    t += ` Status: spricht=${speechSynthesis.speaking}, wartet=${speechSynthesis.pending}, pausiert=${speechSynthesis.paused}.`;
+  if (typeof stand.sprachVariante === "number" && SPRACH_VARIANTEN[stand.sprachVariante])
+    t += ` Funktionierende Einstellung: „${SPRACH_VARIANTEN[stand.sprachVariante].name}".`;
   return t;
 }
 
@@ -2068,8 +2135,11 @@ function verdrahten() {
   $("btn-lesehilfe").addEventListener("click", () => setzeLesehilfe(document.documentElement.dataset.lesehilfe !== "an"));
 
   $("btn-sprach-test").addEventListener("click", () => {
-    vorlesen("Test. Drei plus vier ist sieben.");
-    setTimeout(() => { $("diagnose-text").textContent = sprachDiagnose(); }, 1100);
+    $("btn-sprach-test").textContent = "Läuft …";
+    sprachLabor(text => {
+      $("diagnose-text").textContent = text + " " + sprachDiagnose();
+      if (text.indexOf("Probiere") !== 0) $("btn-sprach-test").textContent = "Nochmal testen";
+    });
   });
 
   $("btn-album").addEventListener("click", zeichneAlbum);
