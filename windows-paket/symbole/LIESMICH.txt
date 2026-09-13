@@ -1,0 +1,19 @@
+SYMBOLE ZUR AUSWAHL
+===================
+Sechs Varianten. UEBERSICHT.png zeigt alle nebeneinander.
+
+So wechseln Sie das Symbol:
+  Rechtsklick auf das Desktop-Symbol
+  ->  Eigenschaften
+  ->  Reiter "Verknüpfung"
+  ->  "Anderes Symbol..."
+  ->  die Meldung "enthält keine Symbole" mit OK wegklicken
+  ->  "Durchsuchen..."
+  ->  eine Datei aus diesem Ordner auswählen
+  ->  Öffnen, OK, OK
+
+Sie können jederzeit wechseln, so oft Sie möchten.
+
+Hinweis: "5-rechenzeichen" sieht groß am besten aus. In der
+Taskleiste, wo das Symbol nur 16 Pixel groß ist, verschwimmen
+die vier Zeichen. Die anderen fünf bleiben auch klein deutlich.
