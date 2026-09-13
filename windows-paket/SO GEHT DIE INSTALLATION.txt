@@ -47,7 +47,9 @@ SCHRITT 4 — Schöneres Symbol (freiwillig)
 -----------------------------------------
     Rechtsklick auf das neue Desktop-Symbol
     ->  Eigenschaften
-    ->  Knopf "Anderes Symbol..."
+    ->  oben auf den Reiter "Verknüpfung" wechseln
+        (WICHTIG: auf "Allgemein" gibt es den Knopf nicht)
+    ->  ganz unten Knopf "Anderes Symbol..."
     ->  "Durchsuchen..."
     ->  die Datei  malteslife.ico  aus dem Ordner auswählen
     ->  OK, OK
