@@ -1159,9 +1159,24 @@ function verdrahten() {
   $("eltern-pin").addEventListener("keydown", e => { if (e.key === "Enter") elternPruefen(); });
 
   $("btn-reset").addEventListener("click", () => {
-    if (confirm("Wirklich den ganzen Fortschritt löschen? Das lässt sich nicht rückgängig machen.")) {
-      stand = leererStand(); sichern(); heim();
-    }
+    const frage = stand.richtigGesamt > 0
+      ? `Wirklich alles zurücksetzen?\n\n`
+        + `Gelöscht werden: ${stand.richtigGesamt} richtige Antworten, `
+        + `${stand.crewHabe.length} gesammelte Levels und alle Gutscheine.\n\n`
+        + `Das lässt sich nicht rückgängig machen. Legen Sie vorher eine Sicherung an, `
+        + `falls Sie den Stand später noch brauchen.`
+      : "Es ist noch kein Fortschritt vorhanden. Trotzdem alles zurücksetzen?";
+    if (!confirm(frage)) return;
+
+    // Geräteeinstellungen überleben: Sie gehören zum Laptop, nicht zum Lernstand.
+    const lesehilfe = stand.lesehilfe;
+    const sprachVariante = stand.sprachVariante;
+    stand = leererStand();
+    stand.lesehilfe = lesehilfe;
+    stand.sprachVariante = sprachVariante;
+    sichern();
+    heim();
+    alert("Zurückgesetzt. Die App steht wieder auf Anfang.");
   });
 
   addEventListener("keydown", e => {

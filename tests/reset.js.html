@@ -1,0 +1,62 @@
+<script>
+var LOG=[],FEHLER=[];
+window.onerror=function(m,f,l){FEHLER.push("JS-Fehler: "+m+" @"+l);};
+function pruefe(n,b){ b?LOG.push(n):FEHLER.push("FEHLGESCHLAGEN: "+n); }
+var echtesConfirm=window.confirm, echtesAlert=window.alert;
+var gefragt="", gemeldet="";
+window.alert=function(t){ gemeldet=t; };
+try{
+  // Vollen Spielstand aufbauen, inklusive Geraeteeinstellungen
+  stand.richtigGesamt=463; stand.crewHabe=[0,1,2,3,4,5,6,7,8];
+  stand.kapitel[0].levelFertig=5; stand.kapitel[3].levelFertig=2;
+  stand.streak=17; stand.heuteZahl=12;
+  stand.stats={"k0s1":{versuche:80,richtig:71}};
+  stand.gutscheine={"k1l1":{was:"Eis",code:"M-K1L1-1111",eingeloest:true}};
+  stand.testWoche={woche:wochenSchluessel(),versuche:2,bestanden:true,eingeloest:true};
+  stand.wocheThemen={"0|3":14};
+  stand.lesehilfe=true; stand.sprachVariante=2;
+
+  document.getElementById("btn-eltern").click();
+  document.getElementById("eltern-pin").value="0902";
+  document.getElementById("btn-eltern-pin").click();
+
+  // Abbrechen darf nichts anruehren
+  window.confirm=function(t){ gefragt=t; return false; };
+  document.getElementById("btn-reset").click();
+  pruefe("Rueckfrage nennt die Zahl der Antworten", gefragt.indexOf("463")>0);
+  pruefe("Rueckfrage nennt die Levels", gefragt.indexOf("9 gesammelte")>0);
+  pruefe("Rueckfrage empfiehlt eine Sicherung", gefragt.indexOf("Sicherung")>0);
+  pruefe("Abbrechen loescht nichts", stand.richtigGesamt===463);
+
+  // Jetzt wirklich zuruecksetzen
+  window.confirm=function(){ return true; };
+  document.getElementById("btn-reset").click();
+  pruefe("Antworten auf null", stand.richtigGesamt===0);
+  pruefe("Crew geleert", stand.crewHabe.length===0);
+  pruefe("Alle Level zurueck", stand.kapitel.every(function(k){return k.levelFertig===0;}));
+  pruefe("Gutscheine weg", Object.keys(stand.gutscheine).length===0);
+  pruefe("Statistik weg", Object.keys(stand.stats).length===0);
+  pruefe("Serie weg", stand.streak===0);
+  pruefe("Tageszaehler weg", stand.heuteZahl===0);
+  pruefe("Wochentest weg", stand.testWoche.bestanden===false);
+  pruefe("Geuebte Themen weg", Object.keys(stand.wocheThemen).length===0);
+  pruefe("Lesehilfe bleibt erhalten", stand.lesehilfe===true);
+  pruefe("Vorlese-Einstellung bleibt erhalten", stand.sprachVariante===2);
+  pruefe("Rueckmeldung nach dem Zuruecksetzen", gemeldet.indexOf("Zurückgesetzt")===0);
+  pruefe("Startbildschirm zeigt null Prozent", document.getElementById("gesamt-prozent").textContent.indexOf("0")===0);
+  pruefe("Album wieder leer", document.getElementById("album-zahl").textContent==="0/55");
+  pruefe("Knopf sagt wieder LOS GEHT'S", document.getElementById("btn-weiter").textContent.indexOf("LOS GEHT")>0);
+  pruefe("Kapitelpunkte alle aus", document.querySelectorAll("#kapitel-liste .pkt.an").length===0);
+
+  // Ohne Fortschritt andere Rueckfrage
+  gefragt="";
+  window.confirm=function(t){ gefragt=t; return false; };
+  document.getElementById("btn-eltern").click();
+  document.getElementById("eltern-pin").value="0902";
+  document.getElementById("btn-eltern-pin").click();
+  document.getElementById("btn-reset").click();
+  pruefe("Ohne Fortschritt passende Rueckfrage", gefragt.indexOf("noch kein Fortschritt")>0);
+}catch(e){ FEHLER.push("ABSTURZ: "+e.message+" | "+(e.stack||"").split("\n")[1]); }
+window.confirm=echtesConfirm; window.alert=echtesAlert;
+document.title = FEHLER.length ? ("### "+FEHLER.length+" PROBLEME ### "+FEHLER.join(" ;; ")) : ("ALLE "+LOG.length+" TESTS BESTANDEN");
+</script>
