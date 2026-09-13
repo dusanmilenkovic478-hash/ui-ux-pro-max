@@ -50,9 +50,12 @@ SCHRITT 4 — Schöneres Symbol (freiwillig)
     ->  oben auf den Reiter "Verknüpfung" wechseln
         (WICHTIG: auf "Allgemein" gibt es den Knopf nicht)
     ->  ganz unten Knopf "Anderes Symbol..."
+    ->  Windows meldet jetzt: "... enthält keine Symbole"
+        Das ist KEIN Fehler. Einfach auf OK klicken.
+    ->  die Liste mit Windows-Symbolen ignorieren
     ->  "Durchsuchen..."
-    ->  die Datei  malteslife.ico  aus dem Ordner auswählen
-    ->  OK, OK
+    ->  die Datei  malteslife.ico  aus Ihrem App-Ordner auswählen
+    ->  Öffnen, dann OK, dann OK
 
 Im selben Fenster können Sie unter "Ausführen" auch
 "Minimiert" einstellen — dann blitzt das schwarze Fenster
