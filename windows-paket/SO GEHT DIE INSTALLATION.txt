@@ -162,6 +162,13 @@ Das Vorlesen prüfen
     auf Ihrem Arbeitszugang über den Server fehlt die Tonausgabe,
     deshalb ging es dort nicht.
 
+Wenn statt der App die Browser-Startseite aufgeht
+    Dann enthält der Ordnername ein Sonderzeichen — einen Akzent,
+    einen Apostroph oder einen Umlaut. Benennen Sie den Ordner um,
+    zum Beispiel in  MaltesLife  (nur Buchstaben und Zahlen).
+    Danach die Desktop-Verknüpfung neu anlegen, die alte zeigt
+    dann ins Leere.
+
 Wenn etwas nicht geht
     Schicken Sie mir, was auf dem Bildschirm steht. Die App sagt
     inzwischen ziemlich genau, woran es hakt.

@@ -4,9 +4,9 @@ rem  MALTE'S LIFE starten
 rem  Oeffnet die App in einem eigenen Fenster, ohne Browser-Leiste.
 rem  Diese Datei muss im selben Ordner liegen wie MaltesLife.html
 rem ============================================================
-setlocal
-set "SEITE=%~dp0MaltesLife.html"
+setlocal enableextensions
 
+set "SEITE=%~dp0MaltesLife.html"
 if not exist "%SEITE%" (
   echo.
   echo   MaltesLife.html wurde nicht gefunden.
@@ -15,6 +15,14 @@ if not exist "%SEITE%" (
   pause
   exit /b 1
 )
+
+rem Enthaelt der Pfad Sonderzeichen wie Akzente, Apostrophe oder
+rem Umlaute, kann der Browser die Adresse nicht lesen und oeffnet
+rem seine Startseite. Windows fuehrt zu jedem Ordner zusaetzlich
+rem einen Kurznamen ohne solche Zeichen - den nehmen wir.
+set "KURZ="
+for %%I in ("%~dp0MaltesLife.html") do set "KURZ=%%~sfI"
+if defined KURZ if exist "%KURZ%" set "SEITE=%KURZ%"
 
 rem Windows-Pfad in eine Adresse umwandeln: Backslash zu Schraegstrich
 set "ADRESSE=file:///%SEITE:\=/%"
