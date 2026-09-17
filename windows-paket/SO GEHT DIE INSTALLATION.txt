@@ -5,6 +5,23 @@ nichts in Windows eingetragen und nichts verändert.
 Die App ist ein Ordner, den man auch einfach wieder löschen kann.
 
 
+SCHRITT 0 — Die ZIP-Datei freigeben (erspart Warnungen)
+------------------------------------------------------
+Bevor Sie auspacken:
+    Rechtsklick auf  MaltesLife-Windows.zip
+    ->  Eigenschaften
+    ->  Reiter "Allgemein", ganz unten
+    ->  Häkchen bei "Zulassen"
+    ->  Übernehmen, OK
+
+Windows markiert heruntergeladene Dateien und warnt sonst bei
+jedem Start ("Der Herausgeber konnte nicht verifiziert werden").
+Wer das VOR dem Auspacken macht, hat später Ruhe.
+
+Schon ausgepackt? Dann dasselbe mit der Datei
+"Malte's Life starten.bat" machen.
+
+
 SCHRITT 1 — Ordner anlegen
 --------------------------
 Kopieren Sie alle drei Dateien aus diesem Paket in einen Ordner
@@ -25,13 +42,18 @@ Doppelklick auf   Malte's Life starten.bat
 Kurz blitzt ein schwarzes Fenster auf, dann öffnet sich die App
 in einem eigenen Fenster ohne Browser-Leiste.
 
-Falls Windows warnt ("Der Computer wurde geschützt"):
-    auf "Weitere Informationen" klicken
-    dann auf "Trotzdem ausführen"
-Das kommt, weil die Datei aus dem Internet stammt. Sie können
-die Datei auch vorher freigeben:
-    Rechtsklick auf die .bat  ->  Eigenschaften
-    ->  ganz unten Haken bei "Zulassen"  ->  OK
+Falls Windows warnt:
+    "Der Herausgeber konnte nicht verifiziert werden"
+        ->  auf "Ausführen" klicken
+        ->  ein Häkchen "Vor dem Öffnen immer bestätigen"
+            vorher wegklicken
+    "Der Computer wurde durch Windows geschützt"
+        ->  "Weitere Informationen"  ->  "Trotzdem ausführen"
+
+Beides kommt daher, dass die Datei aus dem Internet stammt und
+keine gekaufte Signatur hat. Damit die Meldung nicht wiederkommt
+(wichtig, damit Malte sie nie sieht), machen Sie Schritt 0
+nachträglich mit der .bat-Datei.
 
 
 SCHRITT 3 — Symbol auf den Desktop

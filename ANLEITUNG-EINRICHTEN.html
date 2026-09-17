@@ -179,6 +179,11 @@ td:first-child{font-weight:700; white-space:nowrap}
     <span class="nr">3</span>
     <div>
       <h2>Die ZIP-Datei auspacken</h2>
+      <div class="kasten ok">
+        <b>Zuerst freigeben — das erspart Ihnen später alle Warnungen</b>
+        <p>Rechtsklick auf <code>MaltesLife-Windows.zip</code> → <b>Eigenschaften</b> → auf dem Reiter <b>Allgemein</b> ganz unten das Kästchen <b>Zulassen</b> ankreuzen → <b>OK</b>.</p>
+        <p>Windows markiert heruntergeladene Dateien und warnt sonst bei jedem Start. Wer das <b>vor</b> dem Auspacken macht, hat später Ruhe.</p>
+      </div>
       <ol>
         <li>Rechtsklick auf <code>MaltesLife-Windows.zip</code></li>
         <li><span class="pfad">Alle extrahieren…</span></li>
@@ -206,9 +211,9 @@ td:first-child{font-weight:700; white-space:nowrap}
       <p>Kurz blitzt ein schwarzes Fenster auf — das gehört so. Dann öffnet sich die App in einem eigenen Fenster, ohne Adressleiste.</p>
       <div class="kasten warn">
         <b>Falls Windows warnt</b>
-        <p>„Der Computer wurde durch Windows geschützt“ erscheint, weil die Datei aus dem Internet kommt. Sie ist in Ordnung:</p>
-        <p><span class="pfad">Weitere Informationen → Trotzdem ausführen</span></p>
-        <p>Damit die Warnung nicht jedes Mal kommt: Rechtsklick auf die Datei → <b>Eigenschaften</b> → ganz unten Haken bei <b>Zulassen</b> → OK.</p>
+        <p>Es erscheint <i>„Der Herausgeber konnte nicht verifiziert werden“</i> oder <i>„Der Computer wurde durch Windows geschützt“</i>. Beides kommt daher, dass die Datei aus dem Internet stammt und keine gekaufte Signatur hat. Sie ist in Ordnung.</p>
+        <p>Jetzt: auf <b>Ausführen</b> klicken (bei der zweiten Meldung erst auf <b>Weitere Informationen</b>). Ein Häkchen <b>„Vor dem Öffnen dieser Datei immer bestätigen“</b> vorher wegklicken.</p>
+        <p><b>Damit es nicht wiederkommt</b> — und das sollten Sie machen, damit Malte die Meldung nie sieht: Rechtsklick auf <code>Malte's Life starten.bat</code> → <b>Eigenschaften</b> → Reiter <b>Allgemein</b> → ganz unten Häkchen bei <b>Zulassen</b> → <b>Übernehmen</b> → <b>OK</b>.</p>
       </div>
     </div>
   </div>
@@ -307,6 +312,7 @@ td:first-child{font-weight:700; white-space:nowrap}
   <div class="tab-huelle">
     <table>
       <tbody>
+        <tr><td>„Herausgeber konnte nicht verifiziert werden“</td><td>Windows-Warnung für Dateien aus dem Internet. Auf <b>Ausführen</b> klicken. Dauerhaft weg über Eigenschaften → <b>Zulassen</b> (siehe Schritt 4).</td></tr>
         <tr><td>Nichts passiert beim Doppelklick</td><td>Liegen alle Dateien im selben Ordner? Die <code>.bat</code> sagt Ihnen sonst, was fehlt.</td></tr>
         <tr><td>Die App öffnet sich im normalen Browser-Fenster</td><td>Funktioniert trotzdem. Es heißt nur, dass Edge und Chrome nicht am üblichen Ort liegen.</td></tr>
         <tr><td>Der Fortschritt scheint weg</td><td>Wurde der Ordner verschoben? Zurückschieben hilft. Sonst die Sicherung einlesen.</td></tr>
